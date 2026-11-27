@@ -22,6 +22,11 @@ SUBMISSION:
 """${String(text).slice(0, 12000)}"""`;
 }
 
+/** The server's own check for work that tries to instruct the grader. Runs whether or not AI was used. */
+export function graderInjection(text) {
+  return /(ignore (all|previous|the) (instructions|rubric)|give (me|this) (a )?(5|full marks|100))/i.test(String(text)) ? 'Text tries to instruct the grader' : '';
+}
+
 /** Keeps only valid scores, quotes that really appear in the text, and confidences in 0..1. */
 export function cleanFirstPass(rubric, json, text) {
   const list = Array.isArray(json?.criteria) ? json.criteria : [];
@@ -36,6 +41,6 @@ export function cleanFirstPass(rubric, json, text) {
     return { id: c.id, ai: score, conf: +conf.toFixed(2), evidence };
   });
   const flag = typeof json?.flag === 'string' ? json.flag.slice(0, 160) : '';
-  const inj = /(ignore (all|previous|the) (instructions|rubric)|give (me|this) (a )?(5|full marks|100))/i.test(text) ? 'Text tries to instruct the grader' : '';
+  const inj = graderInjection(text);
   return { crit, flags: [flag, inj].filter(Boolean), at: new Date().toISOString() };
 }

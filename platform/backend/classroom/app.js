@@ -21,7 +21,7 @@ import {
   hashPassword, verifyPassword, passwordProblem, newToken, sha256, newId, newJoinCode, normCode,
   normEmail, validEmail, parseCookies, sessionCookie, rateLimiter,
 } from './security.js';
-import { rubricFor, firstPassPrompt, cleanFirstPass } from './rubrics.js';
+import { rubricFor, firstPassPrompt, cleanFirstPass, graderInjection } from './rubrics.js';
 
 const COOKIE = 'cai_s';
 const SESSION_DAYS = 14;
@@ -520,8 +520,15 @@ export function createClassroomApp({ store, llm, env = process.env, siteDir, log
     const s = await subInClass(req);
     res.json({ sub: { ...s, rubric: rubricFor(s.key) } });
   });
+  // Once work is sent to faculty or released, only faculty can change it. Flags never clear.
+  const taMayGrade = (req, s) => {
+    if (req.user.role === 'faculty') return;
+    if (s.status === 'faculty') throw new HttpError(409, 'with_faculty', 'This work is waiting for the instructor. Only they can change it now.');
+    if (s.status === 'released') throw new HttpError(409, 'released', 'This grade is already released. Ask the instructor to change it.');
+  };
   api.post('/subs/:id/ai', staff, async (req, res) => {
     const s = await subInClass(req);
+    taMayGrade(req, s);
     const rubric = rubricFor(s.key);
     let json;
     if (req.body && req.body.json && typeof req.body.json === 'object') {
@@ -534,7 +541,9 @@ export function createClassroomApp({ store, llm, env = process.env, siteDir, log
       catch (err) { logger.error('first pass', err?.message || err); throw new HttpError(502, 'ai_error', 'The AI did not answer. Try again.'); }
     }
     dropSnap(s.classId);
+    const before = s.ai?.flags || [];
     s.ai = cleanFirstPass(rubric, json, s.text);
+    s.ai.flags = [...new Set([...before, ...s.ai.flags])];
     s.ai.by = req.body?.json ? 'ta-key' : 'server';
     s.status = 'ai_suggested';
     await store.put('subs', s.id, s);
@@ -542,6 +551,7 @@ export function createClassroomApp({ store, llm, env = process.env, siteDir, log
   });
   api.post('/subs/:id/review', staff, async (req, res) => {
     const s = await subInClass(req);
+    taMayGrade(req, s);
     const rubric = rubricFor(s.key);
     const scores = {};
     for (const c of rubric) {
@@ -554,7 +564,8 @@ export function createClassroomApp({ store, llm, env = process.env, siteDir, log
     s.ta = scores; s.comment = comment; s.reviewedBy = req.user.name; s.reviewedAt = new Date().toISOString(); s.acceptedAI = !!req.body.acceptedAI;
     const lowConf = (s.ai?.crit || []).some((c) => c.conf < 0.6);
     const gap = (s.ai?.crit || []).some((c) => Math.abs((scores[c.id] ?? c.ai) - c.ai) >= 2);
-    const why = req.user.role === 'faculty' ? null : (s.ai?.flags?.length ? 'flagged' : lowConf ? 'low AI confidence' : gap ? 'TA and AI differ by 2+' : null);
+    const flagged = (s.ai?.flags?.length || 0) > 0 || !!graderInjection(s.text);
+    const why = req.user.role === 'faculty' ? null : (flagged ? 'flagged' : lowConf ? 'low AI confidence' : gap ? 'TA and AI differ by 2+' : null);
     dropSnap(s.classId);
     s.status = why ? 'faculty' : 'released'; s.why = why;
     await store.put('subs', s.id, s);

@@ -63,7 +63,7 @@ export function createService({ store, llm, sink = { write: async () => {} }, cl
     async recordEvent(input) {
       const activity = getActivity(input.object);
       const evt = {
-        id: input.id || `evt_${randomUUID()}`,
+        id: `evt_${randomUUID()}`,
         actor: input.actor,
         verb: input.verb,
         object: input.object,

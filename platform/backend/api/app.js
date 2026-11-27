@@ -9,7 +9,7 @@ import { GradingError } from '../shared/grading.js';
 import { SuggestionError } from '../llm/gradeSuggest.js';
 
 const EventBody = z.object({
-  id: z.string().min(1).max(100).optional(),
+  // No client-chosen id: the server always makes one, so nobody can overwrite another event.
   actor: z.string().min(1).max(100),
   verb: z.enum(VERBS),
   object: z.string().min(1).max(100),

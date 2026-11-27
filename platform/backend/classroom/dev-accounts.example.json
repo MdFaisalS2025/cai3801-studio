@@ -1,0 +1,10 @@
+{
+  "_note": "Throwaway accounts for local testing only (CLASS_DB in a temp folder). Never use these on a real deployment.",
+  "setupToken": "local-setup-123",
+  "faculty": { "name": "Test Faculty", "email": "faculty.test@example.edu", "password": "faculty-test-pass-01" },
+  "ta": { "name": "Test TA", "email": "ta.test@example.edu", "password": "ta-test-pass-0001" },
+  "students": [
+    { "name": "Test Student One", "email": "student1.test@example.edu", "password": "student-test-pass-1" },
+    { "name": "Test Student Two", "email": "student2.test@example.edu", "password": "student-test-pass-2" }
+  ]
+}

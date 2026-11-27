@@ -1,0 +1,24 @@
+# Render blueprint (free plan, no credit card). The free plan sleeps after 15 idle minutes,
+# so the first visitor after a quiet spell waits up to a minute. Data lives in Turso, not on Render.
+services:
+  - type: web
+    name: cai3801-studio
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: CLASS_STORE
+        value: libsql
+      - key: LLM_PROVIDER
+        value: none
+      - key: COOKIE_SECURE
+        value: "on"
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: SETUP_TOKEN
+        sync: false
+      - key: PUBLIC_URL
+        sync: false

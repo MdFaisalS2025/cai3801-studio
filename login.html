@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sign in · CAI 3801 Studio</title>
+<style>
+:root{--usf:#006747;--usf-d:#00543a;--gold:#cfc493;--gold-l:#f3f0dd;--ink:#1b1f1d;--muted:#59605c;--line:#dde2df;--bg:#f5f6f4;--sheet:#fff;--bad:#b3342a}
+@media (prefers-color-scheme:dark){:root{--ink:#e8ebe9;--muted:#a3aba6;--line:#2c322f;--bg:#111412;--sheet:#181c1a;--gold-l:#2b2a1d;--bad:#ff8a80}}
+*{box-sizing:border-box}html,body{margin:0}body{font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--usf);color:#fff;padding:14px 20px;border-bottom:3px solid var(--gold);display:flex;gap:10px;align-items:center}header b{color:var(--gold)}
+main{flex:1;display:grid;place-items:start center;padding:40px 16px}
+.card{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:28px;width:100%;max-width:440px}
+h1{font-size:24px;margin:0 0 6px}p.sub{color:var(--muted);margin:0 0 20px}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input[type=text],input[type=email],input[type=password],input[type=date]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:inherit}
+input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted);margin-top:4px}
+button.btn{margin-top:20px;width:100%;font:600 16px/1 inherit;font-family:inherit;padding:13px;border:0;border-radius:8px;background:var(--usf);color:#fff;cursor:pointer}button.btn:disabled{opacity:.6;cursor:default}
+.err{color:var(--bad);font-size:14px;margin-top:12px;min-height:1em}
+.links{margin-top:18px;font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}a{color:var(--usf)}@media (prefers-color-scheme:dark){a{color:#7fd1a8}}
+.note{background:var(--gold-l);border-radius:8px;padding:10px 12px;font-size:14px;margin-top:14px}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:14px}.chk input{margin-top:3px}
+details{font-size:14px;margin-top:10px}summary{cursor:pointer;color:var(--usf)}
+</style></head>
+<body>
+<header><span><b>CAI 3801</b> · AI &amp; Analytics Studio</span></header>
+<main><div class="card" id="card" aria-live="polite"><p>Loading…</p></div></main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function api(path,body){const r=await fetch("/api/c"+path,body?{method:"POST",headers:{"content-type":"application/json","x-cai-csrf":"1"},body:JSON.stringify(body)}:{});let j={};try{j=await r.json();}catch(e){}if(!r.ok)throw new Error(j.message||"Something went wrong. Try again.");return j;}
+const PRIVACY=`<details><summary>How your data is used</summary><p>Your instructor and TAs can see your progress, your submissions, and the prompts you write to the AI tools, so they can help you learn to prompt better. Prompt scores never count toward your grade. AI features use your own free Gemini key from Google; the key stays in your browser and our server never sees it. You can download your data from the Studio at any time. Ask your instructor to delete your account at the end of the term.</p></details>`;
+function form(title,sub,fields,btn,extra=""){ $("#card").innerHTML=`<h1>${title}</h1><p class="sub">${sub}</p><form id="f" novalidate>${fields}<div class="err" id="err" role="alert"></div><button class="btn" id="go">${btn}</button></form>${extra}`;}
+const F={
+ name:(v="")=>`<label for="name">Your name</label><input type="text" id="name" autocomplete="name" value="${esc(v)}" required>`,
+ email:(v="",ro=false)=>`<label for="email">Email</label><input type="email" id="email" autocomplete="email" value="${esc(v)}" ${ro?"readonly":""} required>`,
+ pw:(nw)=>`<label for="pw">${nw?"Choose a password":"Password"}</label><input type="password" id="pw" autocomplete="${nw?"new-password":"current-password"}" required>${nw?'<div class="hint">At least 10 characters. A short sentence works well.</div>':""}`,
+};
+function bind(fn){$("#f").onsubmit=async e=>{e.preventDefault();const b=$("#go");b.disabled=true;$("#err").textContent="";try{await fn();location.href="/";}catch(err){$("#err").textContent=err.message;b.disabled=false;}};const first=$("#f input");if(first)first.focus();}
+const val=id=>($("#"+id)||{}).value||"";
+async function main(){
+  const p=location.pathname.split("/").filter(Boolean);
+  try{const s=await fetch("/api/c/session");
+    if(s.ok&&p[0]==="join"&&p[1]){const me=await s.json();return signedInAs(me.user);}
+    if(s.ok&&p[0]!=="reset"&&p[0]!=="invite"&&p[0]!=="privacy"){location.href="/";return;}}catch(e){}
+  if(p[0]==="setup"||p[0]==="login"||!p[0]){const st=await api("/setup").catch(()=>({}));if(st.needsSetup){return setup();}}
+  if(p[0]==="join")return join(p[1]||"");
+  if(p[0]==="forgot")return forgot();
+  if(p[0]==="privacy")return privacy();
+  if(p[0]==="reset"||p[0]==="invite")return token(p[1]||"");
+  return login();
+}
+function login(){form("Sign in","Use the email and password you joined with.",F.email()+F.pw(false),"Sign in",`<div class="links"><a href="/join">I have a class code</a><a href="/forgot">Forgot your password?</a></div>`);
+  bind(()=>api("/login",{email:val("email"),password:val("pw")}));}
+async function join(code){
+  if(!code){form("Join your class","Enter the class code your instructor gave you.",`<label for="code">Class code</label><input type="text" id="code" autocomplete="off" placeholder="ABCD-EFGH" required>`,"Continue",`<div class="links"><a href="/login">I already have an account</a></div>`);
+    $("#f").onsubmit=e=>{e.preventDefault();const c=val("code").trim();if(c)location.href="/join/"+encodeURIComponent(c);};$("#code").focus();return;}
+  let info;try{info=await api("/join/"+encodeURIComponent(code));}catch(e){$("#card").innerHTML=`<h1>Code not found</h1><p class="sub">${esc(e.message)}</p><div class="links"><a href="/join">Try another code</a><a href="/login">Sign in</a></div>`;return;}
+  form("Join "+esc(info.className),`${esc(info.term)} · ${esc(info.instructor)}. Create your account. Use the name your instructor knows you by.`,F.name()+F.email()+F.pw(true)+`<label class="chk"><input type="checkbox" id="consent"> <span>I understand my instructor and TAs can see my work and the prompts I write to the AI tools.</span></label>`+PRIVACY,"Create account",`<div class="links"><a href="/login">I already have an account</a><a href="/privacy" target="_blank">Privacy</a></div>`);
+  const secs=info.sections||[];if(secs.length>1){$("#name").insertAdjacentHTML("beforebegin",`<label for="sec">Your section</label><select id="sec" required style="width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:inherit"><option value="">Choose your section</option>${secs.map(x=>`<option>${esc(x)}</option>`).join("")}</select>`);}
+  bind(()=>api("/join",{code,name:val("name"),email:val("email"),password:val("pw"),consent:$("#consent").checked,section:secs.length>1?val("sec"):secs[0]}));}
+/* Someone already signed in opened a join link (common when testing several roles on one computer). */
+function signedInAs(u){$("#card").innerHTML=`<h1>You're already signed in</h1><p class="sub">This browser is signed in as <b>${esc(u.name)}</b> (${esc(u.email)}). To make a new account with this class code, sign out first. To test as several people at once, use a private window for each.</p><button class="btn" id="out">Sign out and continue</button><div class="links"><a href="/">Go to the Studio as ${esc(u.name.split(" ")[0])}</a></div>`;
+  $("#out").onclick=async()=>{$("#out").disabled=true;await fetch("/api/c/logout",{method:"POST",headers:{"x-cai-csrf":"1"}}).catch(()=>{});location.reload();};}
+function forgot(){form("Forgot your password?","Enter the email you joined with. Your TA or instructor will send you a reset link, usually within a day.",F.email(),"Ask for a reset link",`<div class="links"><a href="/login">Back to sign in</a></div>`);
+  $("#f").onsubmit=async e=>{e.preventDefault();$("#go").disabled=true;try{await api("/reset-request",{email:val("email")});$("#card").innerHTML=`<h1>Request sent</h1><p class="sub">If that email has an account, your TA or instructor can now see your request. They'll send you a link that works once and lasts 48 hours. Check your USF email and Canvas messages.</p><div class="links"><a href="/login">Back to sign in</a></div>`;}catch(err){$("#err").textContent=err.message;$("#go").disabled=false;}};$("#email").focus();}
+function privacy(){$("#card").innerHTML=`<h1>Privacy</h1><p class="sub">What the CAI 3801 Studio stores and who sees it.</p>
+  <p><b>What we store.</b> Your name, email, section, a scrambled form of your password, your progress, the prompts you write in the Studio's AI tools, your submissions, and grades and feedback from your TA.</p>
+  <p><b>Who sees it.</b> You, your instructor and the course TAs. Nobody else. Prompt scores coach you; they never count toward your grade.</p>
+  <p><b>AI.</b> AI features use your own free Gemini key. Your key stays in your browser and goes only to Google; our server never sees it. On Google's free tier, Google may use what you send to improve its products, so don't paste personal or sensitive information.</p>
+  <p><b>Your choices.</b> You can download all your data from your Account page. Ask your instructor to delete your account at any time. Course accounts are deleted after the term ends.</p>
+  <p><b>Cookies.</b> One cookie keeps you signed in. No ads, no tracking.</p><div class="links"><a href="/login">Sign in</a></div>`;}
+async function token(t){
+  let info;try{info=await api("/token/"+encodeURIComponent(t));}catch(e){$("#card").innerHTML=`<h1>Link expired</h1><p class="sub">${esc(e.message)}</p><div class="links"><a href="/login">Sign in</a></div>`;return;}
+  if(info.kind==="reset"){form("Set a new password",`For ${esc(info.email)}.`,F.pw(true),"Save and sign in");bind(()=>api("/token/"+encodeURIComponent(t),{password:val("pw")}));}
+  else{form("Join as a TA",`You've been invited to help with ${esc(info.className)}.`,F.name()+F.email()+F.pw(true),"Create TA account");bind(()=>api("/token/"+encodeURIComponent(t),{name:val("name"),email:val("email"),password:val("pw")}));}}
+function setup(){form("Set up your course","First run. This creates the faculty account and the class. The setup code is printed in the server log.",
+  `<label for="tok">Setup code</label><input type="text" id="tok" autocomplete="off" required>`+F.name()+F.email()+F.pw(true)+
+  `<label for="cn">Class name</label><input type="text" id="cn" value="CAI 3801: AI &amp; Analytics for Organizations"><label for="term">Term</label><input type="text" id="term" value="Fall 2026"><label for="ts">First day of week 1</label><input type="date" id="ts" value="2026-08-24"><div class="hint">Sets which week the Studio shows as "this week".</div>`,"Create course");
+  bind(()=>api("/setup",{setupToken:val("tok").trim(),name:val("name"),email:val("email"),password:val("pw"),className:val("cn"),term:val("term"),termStart:val("ts")}));}
+main();
+</script>
+</body></html>

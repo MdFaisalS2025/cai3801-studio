@@ -1,0 +1,337 @@
+<title>CAI 3801 Lab Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@500;600;700&display=swap">
+<style>
+/* Layout: a long technical brief in one 920px column; tables and the diagram scroll inside their own frames. */
+:root{
+  --bg:#f6f7f4; --surface:#ffffff; --ink:#15211b; --muted:#56635b; --line:#d9ded6;
+  --green:#0b5d3f; --green-soft:#e3efe8; --gold:#9a7a12; --gold-soft:#f5eccc;
+  --ok:#1f7a45; --warn:#a15c00; --bad:#b0302a; --ok-bg:#e2f2e7; --warn-bg:#fbeedb; --bad-bg:#f8e1df;
+  --display:"Sora",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1512; --surface:#16201b; --ink:#e6ece7; --muted:#9aa89f; --line:#2a362f;
+  --green:#5cc395; --green-soft:#1b3328; --gold:#d8bd5e; --gold-soft:#332c14;
+  --ok:#6fd39a; --warn:#f0b35c; --bad:#f08a80; --ok-bg:#183326; --warn-bg:#3a2a12; --bad-bg:#3a1c1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1512; --surface:#16201b; --ink:#e6ece7; --muted:#9aa89f; --line:#2a362f;
+  --green:#5cc395; --green-soft:#1b3328; --gold:#d8bd5e; --gold-soft:#332c14;
+  --ok:#6fd39a; --warn:#f0b35c; --bad:#f08a80; --ok-bg:#183326; --warn-bg:#3a2a12; --bad-bg:#3a1c1a; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);margin:0}
+.wrap{max-width:920px;margin:0 auto;padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,44px);font-weight:700;letter-spacing:-.02em}
+h2{font-size:26px;font-weight:600;letter-spacing:-.01em}
+h3{font-size:18px;font-weight:600}
+p{margin:0;max-width:68ch}
+section{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:500 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.lede{font-size:18px;color:var(--muted)}
+a{color:var(--green)}
+code,.mono{font-family:var(--mono);font-size:.88em}
+.verdict{background:var(--green-soft);border:1px solid var(--line);border-radius:10px;padding:22px 24px;display:flex;flex-direction:column;gap:10px}
+.verdict strong{font-family:var(--display);font-size:20px;color:var(--green)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.facts div{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.facts b{font:600 20px/1.2 var(--display);font-variant-numeric:tabular-nums}
+.facts span{font-size:13px;color:var(--muted)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:640px}
+th,td{text-align:left;vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+th{font:500 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);background:var(--bg)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;font:500 11px/1 var(--mono);letter-spacing:.04em;padding:5px 8px;border-radius:99px;white-space:nowrap}
+.p-ok{background:var(--ok-bg);color:var(--ok)} .p-warn{background:var(--warn-bg);color:var(--warn)} .p-bad{background:var(--bad-bg);color:var(--bad)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card ul,.list{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.chain span.step{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.chain span.arrow{color:var(--muted)}
+.diagram{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:12px}
+.diagram svg{display:block;min-width:760px;width:100%;height:auto}
+.phase{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+.phase:first-of-type{border-top:0}
+.phase .when{font:500 13px/1.4 var(--mono);color:var(--gold)}
+@media (max-width:560px){.phase{grid-template-columns:1fr;gap:6px}}
+.flag{border-left:3px solid var(--warn);padding:2px 0 2px 14px}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+  <div class="eyebrow">CAI 3801 · AI &amp; Analytics · Fall 2026 · Course audit and build proposal</div>
+  <h1>CAI 3801 Lab Studio</h1>
+  <p class="lede">A complete read of the Canvas course (modules, assignments, quizzes, files, tools, and the project that runs through them), followed by a design for one in-Canvas workspace where students open a lab and find the guidance, the tools, the checks and the submission in one place.</p>
+</header>
+
+<div class="verdict">
+  <strong>Yes, it can be built. One limit shapes the whole design.</strong>
+  <p>Everything browser-based in this course can live inside one Canvas-launched app: the AI simulation lab, LLM calls, guided steps, answer sheets, evidence capture, auto-checking and grade return. Tableau Desktop and the Make.com editor cannot be put inside a web page. The studio wraps around them: it guides each step, receives what students build (the <code>.twbx</code> file, Make run logs), checks it automatically against an answer key computed from the course dataset, and files the submission in SpeedGrader.</p>
+</div>
+
+<section>
+  <div class="eyebrow">Part 1 · What is in the course</div>
+  <h2>The course at a glance</h2>
+  <div class="facts">
+    <div><b>394</b><span>students enrolled</span></div>
+    <div><b>10</b><span>modules (1 unpublished)</span></div>
+    <div><b>18</b><span>graded items in Canvas</span></div>
+    <div><b>9,993</b><span>rows in the Superstore dataset</span></div>
+    <div><b>Mon 11:59 PM</b><span>weekly deadline, no late quizzes</span></div>
+    <div><b>TA</b><span>your Canvas role in this course</span></div>
+  </div>
+  <p>Instructor Dr. Nasir Uddin. Studio meets Tuesdays at 3:30 PM; daily online help sessions run weekdays 6–7 PM; office hours are Thursdays. The Week 1 deck sets the grade split as <b>40% weekly labs, 40% final project, 10% quizzes, 10% participation</b> (Poll Everywhere). The semester map runs Weeks 1–6 Foundation, 7–10 three industries, 11–12 Agentic, 13–14 your own project. Students write no code: every tool is point-and-click.</p>
+  <p>The course thesis appears on almost every page: <i>reconcile before you automate</i>. Check the row count and a control total, let AI draft, and have a named human approve. Every lab grades the student's judgment about AI output, as well as the output itself.</p>
+</section>
+
+<section>
+  <h2>Modules, in the order Canvas shows them</h2>
+  <div class="tbl"><table>
+    <tr><th>Module</th><th>Contents</th><th>What it is</th></tr>
+    <tr><td>Week 1 &amp; 2</td><td>Lecture deck PDF (56 slides)</td><td>Course promise, seven system types (analytics → agent), real cases (Air Canada chatbot, Klarna, Walmart, Visa, USPS), grading, deadlines, required accounts, AI-use policy.</td></tr>
+    <tr><td>Tool Setup (API key) · Wk 2–3</td><td>9-page PDF guide</td><td>Create a course-only Google account, get a free Gemini key from AI Studio, set up the Cloud project, key safety. Groq is the fallback; Claude/OpenAI are covered as background.</td></tr>
+    <tr><td>Tool Setup (Agentic AI &amp; Tableau) · Wk 3–4</td><td>Doc with a SharePoint video link</td><td>Video walkthrough installing Tableau Desktop (student key) and setting up Make.com.</td></tr>
+    <tr><td>Tutorial on First AI Simulation Lab</td><td>Doc with a video link</td><td>Recorded walkthrough of the AI &amp; GenAI Simulation Lab used in Lab 1.</td></tr>
+    <tr><td>Tableau Dataset</td><td><code>superstore_sales_processed.csv</code></td><td>Superstore orders 2014–2017, 20 columns (Order/Ship dates, Customer, Segment, State, Region, Category, Sub-Category, Sales, Quantity, Discount, Profit). Every later lab uses it.</td></tr>
+    <tr><td>Intro to Tableau and Make AI · Wk 5</td><td>Doc with 2 video links</td><td>Two-part tutorial: build a Tableau chart, export a crosstab to Google Sheets, have a Make scenario write a management report into Google Docs.</td></tr>
+    <tr><td>Predictive and Prescriptive Analytics</td><td>Doc with 2 video links (listed twice)</td><td>Forecasting against a state target, and the discount-cap what-if.</td></tr>
+    <tr><td>Dashboard Building</td><td>Tutorial doc with a video link, wireframe <code>.pptx</code></td><td>Containers, chart-level filters, dashboard actions; a 2-slide wireframe template.</td></tr>
+    <tr><td>Agentic AI</td><td><code>Discount_Guardrail_Template.xlsx</code></td><td>The current module. A Make agent reads discount requests from a Google Form, looks up each product's cap on a Policy sheet and decides. The Texas example rows are Binders at a 45% cap (−$14,705 → $1,120) and Appliances at 20% (−$6,147 → $1,076).</td></tr>
+    <tr><td>Poll Everywhere <span class="pill p-warn">unpublished</span></td><td>External tool</td><td>Live in-class polls that count for participation credit.</td></tr>
+  </table></div>
+  <p class="small muted">There is no syllabus body in Canvas (it lives in the Simple Syllabus tool), and there are no discussions or announcements. Three wiki pages exist: the home page and two "Keys" pages, which hold the Tableau activation key. I did not open those.</p>
+</section>
+
+<section>
+  <h2>Assignments and labs</h2>
+  <div class="tbl"><table>
+    <tr><th>Item</th><th>Due</th><th>Pts</th><th>Tools</th><th>What students do and submit</th></tr>
+    <tr><td><b>Pre-Course Survey</b></td><td class="num">Aug 28</td><td class="num">10</td><td>Canvas quiz</td><td>21 questions on major, analytics and GenAI familiarity, tool confidence, learning preferences and ethics.</td></tr>
+    <tr><td><b>Lab 1: From AI Output to Business Judgment</b></td><td class="num">Sep 27</td><td class="num">100</td><td>AI &amp; GenAI Simulation Lab (web app), the student's own Gemini/OpenAI/Anthropic/Grok key, or Replay mode</td><td>Pick a career domain (Marketing, Finance, Accounting, Supply Chain, Management). Complete 7 homework simulations (AI Systems, Token Prediction, Context &amp; Bias, Prompt Design, Temperature, Grounding &amp; Retrieval, Evaluation &amp; Human Responsibility). Each follows Learn → Understand → Predict → Run → Judge, with Field Notes. Submit the generated Portfolio Report as one PDF. Rubric: completion 35, inputs 28, evaluation 28, submission 9.</td></tr>
+    <tr><td><b>Tool Installation</b></td><td class="num">Sep 22</td><td class="num">20</td><td>Tableau Desktop, Make.com</td><td>A Word or PDF file with screenshots proving both tools are set up.</td></tr>
+    <tr><td><b>Tableau and Make AI Practice Lab</b></td><td class="num">Oct 15</td><td class="num">100</td><td>Tableau, Google Sheets, Make.com, Google Docs, LLM</td><td>Rebuild the tutorial chart, export the crosstab to Sheets, rebuild the Make workflow that writes a management report in Docs, then check that the report matches Tableau. Rubric: viz 25, workflow 25, report 20, accuracy 20, quality 10.</td></tr>
+    <tr><td><b>Lab: Descriptive and Diagnostic Analytics</b></td><td class="num">Oct 21</td><td class="num">100</td><td>Tableau, Word answer sheet</td><td>Four sheets: Category &amp; Sub-Category (subtotals, profit labels, red-green color centered at 0), Location Map (Tables filter, average discount in the tooltip), Customer Segments (k-means, 4 clusters renamed by value), Profit KPI (CY/PY Profit and Profit Change % calcs, Year Selection parameter). Answer 15 questions, write 4 captions, complete an AI-use reflection. Submit <code>.twbx</code> and <code>.docx</code>.</td></tr>
+    <tr><td><b>Lab: Predictive &amp; Prescriptive Analytics</b></td><td class="num">Nov 10</td><td class="num">100</td><td>Tableau, Word answer sheet</td><td>The state is assigned by last name (A–F Ohio $6,500 target, G–L Pennsylvania $5,500, M–R New York $20,500, S–Z California $23,000). Forecast sheet: monthly sales, forecast, target reference line, MASE. What-If sheet: Discount Cap parameter (0–80%, step 5%), List Price, Adjusted Sales and Adjusted Profit calcs, a scenario table for 7 caps on the two worst products, an uplift-to-target calculation, a VP recommendation and an AI-use reflection. Wrong state is graded out of 50.</td></tr>
+    <tr><td><b>Design and Present Your Dashboard</b></td><td class="num">Nov 13</td><td class="num">100</td><td>PowerPoint wireframe, Tableau, Zoom / Canvas Studio / YouTube</td><td>Wireframe first, then a 1600×900 dashboard with nested containers: title bar, Sales and Profit KPIs top-left, map top-right as the filter source, Segments, Forecast and What-If across the bottom, and a filter column. Exact filter and action targets are graded. Then a 3–5 minute on-camera video with live clicks. Submit <code>.twbx</code>, wireframe and video link.</td></tr>
+    <tr><td><b>Participation × 7</b></td><td class="num">In class</td><td class="num">10 ea</td><td>Poll Everywhere</td><td>No submission; marked in class.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Quizzes</h2>
+  <div class="tbl"><table>
+    <tr><th>Quiz</th><th>Due</th><th>Format</th><th>Covers</th></tr>
+    <tr><td>Quiz 1: Analytics, AI and Agents</td><td class="num">Sep 24</td><td>20 Q · 20 min · open note</td><td>Classifying systems by role (analytics, predictive AI, generative AI, copilot, automation, AI workflow, agent); human approval gates.</td></tr>
+    <tr><td>Quiz 2: How to Judge AI in Business</td><td class="num">Sep 27</td><td>20 Q · 30 min · Honorlock · the Lab 1 report is the only allowed note</td><td>The NovaMart case: tokens, context, temperature, grounding, "insufficient evidence", evaluation sets, controls.</td></tr>
+    <tr><td>Quiz: Descriptive and Diagnostic</td><td class="num">Oct 24</td><td>10 Q · 20 min · 1 attempt · calculator</td><td>Reading the class figures: category and sub-category bars, Tables map, segments, KPI card, the caption standard, fixing an AI caption.</td></tr>
+    <tr><td>Quiz: Predictive and Prescriptive</td><td class="num">Nov 10</td><td>10 Q · 20 min · Honorlock</td><td>MASE, forecast bands, prescriptive questions, the Texas Binders what-if, the model's assumptions.</td></tr>
+  </table></div>
+  <p class="small muted">Multiple-answer items take off points for wrong selections. Quiz questions are written around figures from class, not each student's own workbook.</p>
+</section>
+
+<section>
+  <h2>Every tool the course depends on</h2>
+  <div class="grid2">
+    <div class="card"><h3>Analytics</h3><ul class="small">
+      <li><b>Tableau Desktop</b> (with Prep) on a free course licence. Windows or Mac only, which the deck calls the one hard requirement.</li>
+      <li><b>Superstore CSV</b>: the single dataset for every analytics lab.</li></ul></div>
+    <div class="card"><h3>AI and automation</h3><ul class="small">
+      <li><b>Make.com</b>: scenarios, AI agent modules, a course code by email.</li>
+      <li><b>Gemini API key</b> (Groq as fallback), used in the sim lab and in Make.</li>
+      <li><b>Firecrawl</b> free tier, listed for Week 4.</li>
+      <li><b>AI &amp; GenAI Simulation Lab</b>: the instructor's own web app (access-code gate, Live or Replay mode, Portfolio PDF).</li></ul></div>
+    <div class="card"><h3>Google, on a course-only account</h3><ul class="small">
+      <li><b>Sheets</b>: the crosstab export, the Policy and Quotes tabs.</li>
+      <li><b>Docs</b>: the AI-written management report.</li>
+      <li><b>Forms</b>: discount requests for the guardrail agent.</li></ul></div>
+    <div class="card"><h3>Delivery and assessment</h3><ul class="small">
+      <li><b>SharePoint/Stream</b> lecture recordings (each module is a doc that holds a link).</li>
+      <li><b>Word answer sheets</b> with yellow boxes, and a <b>PowerPoint</b> wireframe.</li>
+      <li><b>Honorlock</b> proctoring, <b>Poll Everywhere</b>, Simple Syllabus, a Teams help session.</li>
+      <li><b>Zoom, Canvas Studio or YouTube</b> for the dashboard video.</li></ul></div>
+  </div>
+</section>
+
+<section>
+  <h2>The project running through the labs</h2>
+  <p>The labs are one continuous build on the same Superstore data, ending in a governed AI workflow:</p>
+  <div class="chain">
+    <span class="step">Judge AI output<br><span class="muted small">Lab 1</span></span><span class="arrow">→</span>
+    <span class="step">Chart + AI report<br><span class="muted small">Tableau + Make</span></span><span class="arrow">→</span>
+    <span class="step">Describe and diagnose<br><span class="muted small">4 sheets</span></span><span class="arrow">→</span>
+    <span class="step">Forecast + what-if<br><span class="muted small">your state</span></span><span class="arrow">→</span>
+    <span class="step">Dashboard + video<br><span class="muted small">your state</span></span><span class="arrow">→</span>
+    <span class="step">Discount guardrail agent<br><span class="muted small">now</span></span><span class="arrow">→</span>
+    <span class="step">Final project<br><span class="muted small">Wk 13–14 + finals</span></span>
+  </div>
+  <p>The final project (40%) is not in Canvas yet. The deck describes it as reconciled Tableau evidence with explicit metric definitions, specialist workflows with escalation, human approval before any consequential action, normal, edge, adversarial and refusal tests, and a baseline, a target and cost evidence. It has a reconciliation checkpoint in Week 13, a rehearsal in Week 14, and a recorded demo in finals week.</p>
+</section>
+
+<section>
+  <h2>Things I noticed that the studio should fix</h2>
+  <div class="flag"><p><b>Canvas assignment groups are all weighted 0%</b>, while the deck says 40/40/10/10. Students' Canvas grade totals will not match the syllabus until the weights are set.</p></div>
+  <div class="flag"><p><b>No rubrics are attached in Canvas.</b> They exist only as text inside the descriptions and Word files, so SpeedGrader cannot score against them. For 394 students, that means a lot of manual grading.</p></div>
+  <div class="flag"><p><b>Grading the Tableau labs is mostly mechanical.</b> Sheet names, calculated-field formulas, parameter ranges, filter targets and dashboard actions are all stored in the <code>.twbx</code> and can be checked by software. Student answers can be compared to an answer key computed from the CSV.</p></div>
+  <div class="flag"><p><b>The sample AI report ("Report 1") says Office Supplies sales are "N/A".</b> The data has $719,047. The bug came from the crosstab handed to Make. It is a ready-made teaching case for the "check before you automate" rule.</p></div>
+  <div class="flag"><p><b>Files are duplicated or drifting.</b> There are two <code>Lab_Assignment_YourName</code> versions and two copies of the guardrail template, one module links the same doc twice, a Week 1 slide still says "ISM 4212", and some quiz dates differ from their assignment due dates (probably section overrides).</p></div>
+</section>
+
+<section>
+  <div class="eyebrow">Part 2 · Can the all-in-one platform be built?</div>
+  <h2>Tool by tool: what can live inside the studio</h2>
+  <div class="tbl"><table>
+    <tr><th>Course piece</th><th>Inside the studio?</th><th>How</th></tr>
+    <tr><td>AI &amp; GenAI Simulation Lab</td><td><span class="pill p-ok">Fully</span></td><td>Rebuild it as the studio's first lab. It is already a web app with the same Learn → Predict → Run → Judge flow. The Portfolio PDF becomes an automatic submission.</td></tr>
+    <tr><td>LLM calls (Gemini etc.)</td><td><span class="pill p-ok">Fully</span></td><td>A server-side proxy with per-student limits. Either the course pays for one key, or students keep their own key, encrypted and never shown in reports. The proxy logs every prompt and response, which gives the audit trail the course asks for.</td></tr>
+    <tr><td>Word answer sheets</td><td><span class="pill p-ok">Fully</span></td><td>The yellow boxes become form fields with screenshot paste, then export to the same <code>.docx</code>/PDF layout. Numeric answers are checked as students type, against <i>their</i> state's key.</td></tr>
+    <tr><td>Lecture videos</td><td><span class="pill p-ok">Fully</span></td><td>Embed the Stream/SharePoint player (or Canvas Studio) next to the step it teaches, so step 4 sits beside the 4-minute clip that shows it.</td></tr>
+    <tr><td>Wireframe (PowerPoint)</td><td><span class="pill p-ok">Fully</span></td><td>A built-in grid editor preloaded with the seven required boxes, exported as PNG. Its box positions are then compared to the dashboard's container layout in the <code>.twbx</code>.</td></tr>
+    <tr><td>Submission + grades</td><td><span class="pill p-ok">Fully</span>, with LTI</td><td>LTI 1.3 Assignment &amp; Grade Services. Canvas's submission extension lets the studio attach files, so they appear in SpeedGrader with a score and a feedback comment.</td></tr>
+    <tr><td>Tableau Desktop</td><td><span class="pill p-warn">Wrapped</span></td><td>A desktop app cannot run in a page. The studio walks students through each step, takes the <code>.twbx</code> upload, and checks it. Optional later pilot: embed Tableau Cloud web authoring through Tableau's Embedding API, if USF can get a Tableau Cloud site through Tableau's academic program. That would also remove the Chromebook problem.</td></tr>
+    <tr><td>Make.com editor</td><td><span class="pill p-warn">Wrapped</span></td><td>Make cannot be embedded. Students add one final HTTP module that posts each run to the studio, which then shows a live run log, the inputs, the AI draft and the approver as graded evidence. That replaces "screenshot of the workflow".</td></tr>
+    <tr><td>Google Sheets / Docs / Forms</td><td><span class="pill p-warn">Linked</span></td><td>Open in a new tab from the step. The studio reads the generated report through the run webhook and checks it against the Tableau numbers.</td></tr>
+    <tr><td>Honorlock quizzes</td><td><span class="pill p-bad">Stay in Canvas</span></td><td>Proctoring is tied to Canvas quizzes. The studio links to them and can offer unproctored practice versions built from the same figures.</td></tr>
+    <tr><td>Poll Everywhere</td><td><span class="pill p-bad">Stay as is</span></td><td>An in-room tool with nothing to gain from moving it.</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Architecture</h2>
+  <div class="diagram" role="img" aria-label="Architecture: Canvas launches Lab Studio over LTI 1.3. The studio has a lab player, answer sheets, AI sandbox, evidence locker and auto-checker, backed by a database, file storage, an LLM proxy, a twbx parser and an answer-key engine. External tools Tableau Desktop, Make.com and Google send work back by upload or webhook. Grades and files return to Canvas SpeedGrader.">
+  <svg viewBox="0 0 900 470" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, sans-serif" font-size="13">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="var(--muted)"/></marker></defs>
+    <rect x="20" y="30" width="170" height="160" rx="10" fill="var(--gold-soft)" stroke="var(--gold)"/>
+    <text x="105" y="58" text-anchor="middle" font-family="Sora, sans-serif" font-weight="600" font-size="15" fill="var(--ink)">Canvas</text>
+    <text x="105" y="84" text-anchor="middle" fill="var(--ink)">Assignment link</text>
+    <text x="105" y="106" text-anchor="middle" fill="var(--ink)">Roster (NRPS)</text>
+    <text x="105" y="128" text-anchor="middle" fill="var(--ink)">SpeedGrader</text>
+    <text x="105" y="150" text-anchor="middle" fill="var(--ink)">Gradebook</text>
+    <text x="105" y="174" text-anchor="middle" fill="var(--muted)" font-size="11">Honorlock quizzes stay here</text>
+    <rect x="250" y="20" width="400" height="300" rx="12" fill="var(--green-soft)" stroke="var(--green)"/>
+    <text x="450" y="48" text-anchor="middle" font-family="Sora, sans-serif" font-weight="600" font-size="16" fill="var(--green)">Lab Studio (web app)</text>
+    <g fill="var(--surface)" stroke="var(--line)">
+      <rect x="270" y="64" width="175" height="48" rx="8"/><rect x="455" y="64" width="175" height="48" rx="8"/>
+      <rect x="270" y="120" width="175" height="48" rx="8"/><rect x="455" y="120" width="175" height="48" rx="8"/>
+      <rect x="270" y="176" width="360" height="48" rx="8"/>
+    </g>
+    <g fill="var(--ink)" text-anchor="middle">
+      <text x="357" y="86" font-weight="600">Guided lab player</text><text x="357" y="102" fill="var(--muted)" font-size="11">steps · video · checkpoints</text>
+      <text x="542" y="86" font-weight="600">Answer sheets</text><text x="542" y="102" fill="var(--muted)" font-size="11">live numeric checks</text>
+      <text x="357" y="142" font-weight="600">AI sandbox</text><text x="357" y="158" fill="var(--muted)" font-size="11">sim labs · prompt logs</text>
+      <text x="542" y="142" font-weight="600">Evidence locker</text><text x="542" y="158" fill="var(--muted)" font-size="11">uploads · run logs · PDFs</text>
+      <text x="450" y="198" font-weight="600">Auto-checker + instructor dashboard</text><text x="450" y="214" fill="var(--muted)" font-size="11">twbx rules · answer keys · rubric pre-scores · flags</text>
+    </g>
+    <g fill="var(--surface)" stroke="var(--line)">
+      <rect x="270" y="240" width="110" height="62" rx="8"/><rect x="395" y="240" width="110" height="62" rx="8"/><rect x="520" y="240" width="110" height="62" rx="8"/>
+    </g>
+    <g text-anchor="middle" fill="var(--ink)" font-size="12">
+      <text x="325" y="266" font-weight="600">Postgres</text><text x="325" y="284" fill="var(--muted)" font-size="11">+ file storage</text>
+      <text x="450" y="266" font-weight="600">LLM proxy</text><text x="450" y="284" fill="var(--muted)" font-size="11">Gemini / Groq</text>
+      <text x="575" y="266" font-weight="600">Answer-key engine</text><text x="575" y="284" fill="var(--muted)" font-size="11">from Superstore CSV</text>
+    </g>
+    <rect x="710" y="30" width="170" height="290" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+    <text x="795" y="58" text-anchor="middle" font-family="Sora, sans-serif" font-weight="600" font-size="15" fill="var(--ink)">Student's tools</text>
+    <g text-anchor="middle" fill="var(--ink)">
+      <text x="795" y="94" font-weight="600">Tableau Desktop</text><text x="795" y="112" fill="var(--muted)" font-size="11">uploads .twbx</text>
+      <text x="795" y="160" font-weight="600">Make.com</text><text x="795" y="178" fill="var(--muted)" font-size="11">HTTP module posts each run</text>
+      <text x="795" y="226" font-weight="600">Google Sheets/Docs/Forms</text><text x="795" y="244" fill="var(--muted)" font-size="11">read via the Make run</text>
+      <text x="795" y="290" font-weight="600">Video host</text><text x="795" y="306" fill="var(--muted)" font-size="11">link checked</text>
+    </g>
+    <path d="M190,80 L248,80" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+    <text x="219" y="72" text-anchor="middle" fill="var(--muted)" font-size="11">LTI 1.3</text>
+    <path d="M250,140 L192,140" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+    <text x="219" y="158" text-anchor="middle" fill="var(--muted)" font-size="11">AGS</text>
+    <path d="M708,110 L652,110" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+    <path d="M708,170 L652,170" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#ar)"/>
+    <path d="M652,90 L708,90" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#ar)"/>
+    <text x="680" y="82" text-anchor="middle" fill="var(--muted)" font-size="10">opens</text>
+    <rect x="20" y="360" width="860" height="90" rx="10" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/>
+    <text x="40" y="386" font-family="Sora, sans-serif" font-weight="600" fill="var(--ink)">One lab, end to end</text>
+    <text x="40" y="410" fill="var(--ink)">Student clicks the Canvas assignment → studio opens on their assigned state → video + steps → builds in Tableau → uploads .twbx</text>
+    <text x="40" y="432" fill="var(--ink)">→ checker returns "Parameter step is 0.1, expected 0.05" before the deadline → answers checked live → Submit sends files + score to SpeedGrader.</text>
+  </svg>
+  </div>
+</section>
+
+<section>
+  <h2>Proof that auto-checking will work</h2>
+  <p>I recomputed the course's published numbers straight from <code>superstore_sales_processed.csv</code>, using the formulas from the lab sheets. Every value matched exactly, so the answer-key engine can generate a key for each state and grade numeric answers without anyone typing in a key by hand.</p>
+  <div class="tbl"><table>
+    <tr><th>Check</th><th>Course document says</th><th>Recomputed from the CSV</th><th></th></tr>
+    <tr><td>2016 annual sales (Sales KPI)</td><td class="num">$609K</td><td class="num">$609,206</td><td><span class="pill p-ok">match</span></td></tr>
+    <tr><td>2016 sales change vs 2015</td><td class="num">29.5%</td><td class="num">29.5%</td><td><span class="pill p-ok">match</span></td></tr>
+    <tr><td>Texas Binders, sales → adjusted at 45% cap</td><td class="num">$9,043 → $24,867</td><td class="num">$9,043 → $24,867</td><td><span class="pill p-ok">match</span></td></tr>
+    <tr><td>Texas Binders, profit → adjusted at 45% cap</td><td class="num">−$14,705 → $1,120</td><td class="num">−$14,705 → $1,120</td><td><span class="pill p-ok">match</span></td></tr>
+    <tr><td>Texas Appliances at 20% cap</td><td class="num">$2,408 → $9,631 · −$6,147 → $1,076</td><td class="num">$2,408 → $9,631 · −$6,147 → $1,076</td><td><span class="pill p-ok">match</span></td></tr>
+    <tr><td>Office Supplies sales (the "Report 1" bug)</td><td class="num">"N/A"</td><td class="num">$719,047</td><td><span class="pill p-bad">AI report wrong</span></td></tr>
+  </table></div>
+  <p class="small muted">Tableau's forecast values (exponential smoothing, MASE) and k-means clusters are not stored in the <code>.twbx</code>, so those answers are checked against the instructor's per-state key with a tolerance rather than recomputed.</p>
+  <h3>What the <code>.twbx</code> checker can verify</h3>
+  <p class="small">A <code>.twbx</code> is a zip holding the workbook XML and the data extract. The studio can read:</p>
+  <ul class="list small">
+    <li>Exact sheet names ("Category and Sub-Category", "Location Map", "Forecast", "What-If" and so on), and that the Sales KPI sheet is still present.</li>
+    <li>Calculated fields and their formulas: CY Profit, PY Profit, Profit Change %, List Price, Adjusted Sales, Adjusted Profit.</li>
+    <li>The Discount Cap parameter: float type, range 0 to 0.8, step 0.05, % format.</li>
+    <li>The State filter value against the student's assigned state (wrong state is graded out of 50), and the Tables sub-category filter.</li>
+    <li>Reference-line constant equal to the state's target; the forecast is on; a diverging palette centered at 0.</li>
+    <li>Dashboard size 1600×900, the container tree, filter-action source and targets (Map → Segments and What-If only), and the saved opening state (2017, the recommended cap).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>What each lab looks like inside the studio</h2>
+  <div class="grid2">
+    <div class="card"><h3>Lab 1 · AI judgment</h3><p class="small">The sim lab runs natively. Predict is locked until the student commits an answer, and Run goes through the proxy. Field Notes are required before moving on. The Portfolio is generated and submitted automatically.</p></div>
+    <div class="card"><h3>Tableau + Make practice</h3><p class="small">A step rail paired with video clips. The student's Make scenario posts its run to the studio, which compares the report's numbers to the chart and flags mismatches like the "N/A" bug.</p></div>
+    <div class="card"><h3>Descriptive / Diagnostic</h3><p class="small">The Word sheet becomes in-app fields. Uploading the workbook triggers structural checks, and numbers are checked against the key. Captions are checked for a number, a comparison and an implication. The AI-use box keeps its before and after versions.</p></div>
+    <div class="card"><h3>Predictive / Prescriptive</h3><p class="small">The state is assigned automatically from the roster's last name. The scenario table is prefilled with 7 caps to fill in, and the uplift arithmetic (gain ÷ 48 vs target) is checked step by step.</p></div>
+    <div class="card"><h3>Dashboard + video</h3><p class="small">The wireframe is drawn in the studio, and its layout is compared to the dashboard's containers. The "test that catches most mistakes" runs automatically from the action targets. The video link is checked for public access.</p></div>
+    <div class="card"><h3>Agentic guardrail → final project</h3><p class="small">The Policy sheet is generated from the student's own Lab 2 caps. Make runs post to an approval log in the studio, where the student approves or rejects as the named human. Test cases (normal, edge, adversarial, refusal) are scored, which is the evidence the final project asks for.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>What has to be true before it ships</h2>
+  <div class="grid2">
+    <div class="card"><h3>Canvas admin approval</h3><p class="small">Your TA role cannot add LTI tools. That permission is off, and LTI 1.3 developer keys are created at the USF account level. The professor needs to request it from USF IT / Canvas admins, which usually involves a security and accessibility review.</p></div>
+    <div class="card"><h3>Student data (FERPA)</h3><p class="small">Grades and submissions are education records. Host on infrastructure USF approves (USF runs on Microsoft, so Azure is the easiest fit), keep only what the labs need, and never send names to the LLM. That last point matches the course's own data rule.</p></div>
+    <div class="card"><h3>Accessibility</h3><p class="small">Public universities now have to meet WCAG 2.1 AA for web content under the ADA Title II rule. Build that in from the first screen; captioned videos and keyboard-usable steps are the main items.</p></div>
+    <div class="card"><h3>Cost at 394 students</h3><p class="small">Gemini's free tier per student (bring your own key) costs nothing. A single course key needs a budget and rate limits. Hosting a small app and database is low-cost on student-scale traffic.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Build plan</h2>
+  <div>
+    <div class="phase"><div class="when">Phase 0<br>2–3 weeks<br>no admin needed</div><div><p><b>Standalone studio, one lab.</b> Build it the way the sim lab is deployed today: students open a link and upload the generated PDF/DOCX to Canvas themselves. Pilot it on the Agentic Guardrail lab (current module) or the Predictive/Prescriptive lab, with the answer-key engine and <code>.twbx</code> checker. This proves the idea to the professor and to IT.</p></div></div>
+    <div class="phase"><div class="when">Phase 1<br>3–4 weeks</div><div><p><b>LTI 1.3 launch and grade return.</b> Single sign-on from the assignment, roster-based state assignment, files and scores into SpeedGrader. The instructor dashboard shows who is stuck at which step.</p></div></div>
+    <div class="phase"><div class="when">Phase 2<br>4–6 weeks</div><div><p><b>All labs moved in.</b> Port the sim lab, the Make run webhook and evidence log, the wireframe editor, and the final-project evaluation harness with its test cases.</p></div></div>
+    <div class="phase"><div class="when">Phase 3<br>pilot</div><div><p><b>Tableau in the browser.</b> If Tableau's academic program grants a Tableau Cloud site, embed web authoring so Chromebook and iPad students can do every lab.</p></div></div>
+  </div>
+  <p class="small"><b>Suggested stack:</b> Next.js + TypeScript, Postgres, an LTI 1.3 library (for example <code>ltijs</code>), blob storage for uploads, a small server function for the LLM proxy, and JSZip plus an XML parser for <code>.twbx</code> files. All of it can be built and run without paid licences.</p>
+</section>
+
+<section>
+  <h2>Questions to take to the professor</h2>
+  <ul class="list">
+    <li>Should the first version be standalone (fast, no IT review) or wait for LTI?</li>
+    <li>Which lab to pilot first: the current Agentic Guardrail, or rebuilding a finished one (Predictive/Prescriptive) where the answer keys already exist?</li>
+    <li>Is the goal to keep Tableau Desktop, or would he use Tableau Cloud in the browser if USF can get it?</li>
+    <li>One course-paid LLM key, or keep students on their own Gemini keys?</li>
+    <li>Should auto-checks give students feedback before the deadline (formative), or only pre-score for the grader?</li>
+  </ul>
+</section>
+
+<footer>Compiled on Nov 12, 2026 from the live Canvas course (read-only): modules, assignments, quizzes, pages, files, the lecture deck, lab answer sheets, templates and the dataset. Lecture videos on SharePoint were not watched. The Keys pages were not opened. Due dates are shown in US Eastern time.</footer>
+</div>

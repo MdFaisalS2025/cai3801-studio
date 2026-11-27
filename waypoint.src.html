@@ -1,0 +1,487 @@
+<title>CAI 3801 · Canvas demo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23006747'/%3E%3Ctext x='16' y='21' font-size='11' font-family='Arial,sans-serif' font-weight='700' text-anchor='middle' fill='%23CFC493'%3EUSF%3C/text%3E%3C/svg%3E">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+/* A Canvas-style course site in USF colours: green global nav, course menu on the left, one clear action per page. */
+/*__DESK_TOKENS__*/
+:root{
+  --usf:#006747; --usf-d:#00543a; --usf-dd:#003d2a; --usf-gold:#cfc493; --usf-gold-l:#f3f0dd; --link:#006747;
+  --h:"Archivo",ui-sans-serif,system-ui,sans-serif; --b:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --radius:8px; --navw:84px; --barh:60px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--link:#7fd1a8;--usf-gold-l:#2b2a1d}}
+:root[data-theme="dark"]{--link:#7fd1a8;--usf-gold-l:#2b2a1d}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--b);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;text-align:left}
+a{color:var(--link)}
+h1,h2,h3,h4{font-family:var(--h);line-height:1.2;color:var(--ink)}
+ol,ul{padding-left:20px}
+:focus-visible{outline:3px solid var(--usf-gold);outline-offset:2px}
+[tabindex="-1"]:focus{outline:none}
+.hidden{display:none!important}
+.soft{color:var(--muted)}
+.small{font-size:14px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* shell */
+.shell{display:grid;grid-template-columns:var(--navw) minmax(0,1fr);min-height:100vh}
+body.out .shell{display:block}
+body.out .gnav{display:none}
+.gnav{background:var(--usf);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding-bottom:8px;z-index:30}
+.gnav .logo{display:grid;place-items:center;height:72px;font:800 20px/1 var(--h);color:var(--usf-gold);letter-spacing:.03em;border-bottom:1px solid rgba(255,255,255,.16);margin-bottom:6px}
+.gn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 4px;color:#fff;font-size:12.5px;text-align:center;width:100%}
+.gn svg{width:24px;height:24px}
+.gn:hover{background:var(--usf-d)}
+.gn.on{background:var(--sheet);color:var(--usf)}
+.gn .av{width:30px;height:30px;border-radius:50%;background:var(--usf-gold);color:var(--usf-dd);display:grid;place-items:center;font:700 12px/1 var(--b)}
+.gnav .grow{flex:1}
+.main{min-width:0}
+.cbar{display:flex;align-items:center;gap:14px;padding:0 28px;height:var(--barh);border-bottom:1px solid var(--line);background:var(--sheet);position:sticky;top:0;z-index:20}
+.hamb{display:grid;place-items:center;width:36px;height:36px;border-radius:6px;color:var(--usf)}
+.hamb:hover{background:var(--paper)}
+.hamb svg{width:22px;height:22px}
+.crumbs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:15.5px;min-width:0}
+.crumbs button{color:var(--link);text-decoration:underline;text-underline-offset:3px}
+.crumbs .sep{color:var(--muted)}
+.crumbs .here{color:var(--ink);font-weight:500}
+.cbar .end{margin-left:auto;display:flex;gap:10px;align-items:center}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--usf);color:#fff;border-radius:6px;padding:11px 20px;font-weight:600;text-decoration:none;border:1px solid var(--usf);min-height:44px}
+.btn:hover{background:var(--usf-d)}
+.btn.alt{background:var(--sheet);color:var(--link);border-color:var(--line)}
+.btn.alt:hover{border-color:var(--usf)}
+.btn.gold{background:var(--usf-gold);color:var(--usf-dd);border-color:var(--usf-gold)}
+.link{color:var(--link);text-decoration:underline;text-underline-offset:3px;font-weight:500}
+
+/* login */
+.login{min-height:100vh;background:var(--usf);display:grid;place-items:center;padding:32px 16px}
+.lcard{background:var(--sheet);border-radius:12px;width:min(980px,100%);display:grid;grid-template-columns:1.1fr 1fr;overflow:hidden;box-shadow:0 24px 60px -24px rgba(0,0,0,.45)}
+.lcourse{padding:40px;display:flex;flex-direction:column;gap:18px;background:var(--usf-gold-l)}
+.lcourse .seal{display:inline-grid;place-items:center;width:64px;height:64px;border-radius:12px;background:var(--usf);color:var(--usf-gold);font:800 20px/1 var(--h)}
+.lcourse .code{font:800 15px/1 var(--b);color:var(--usf);letter-spacing:.02em}
+.lcourse h1{font-size:clamp(26px,3.2vw,34px)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:15px;padding-top:16px;border-top:1px solid var(--line)}
+.facts dt{color:var(--muted)}
+.lsign{padding:40px;display:flex;flex-direction:column;gap:14px}
+.lsign h2{font-size:24px}
+.accts{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.accts button{display:flex;align-items:center;gap:14px;padding:12px 16px;border-top:1px solid var(--line);min-height:60px}
+.accts button:first-child{border-top:0}
+.accts button:hover{background:var(--paper)}
+.accts .av{width:38px;height:38px;border-radius:50%;background:var(--usf);color:#fff;display:grid;place-items:center;font:700 13px/1 var(--b);flex:none}
+.accts .av.t{background:var(--usf-gold);color:var(--usf-dd)}
+.accts b{display:block;font-weight:600}
+.accts small{color:var(--muted);font-size:13.5px}
+.accts .go{margin-left:auto;color:var(--muted)}
+.lfoot{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:15px}
+details.about{font-size:14px;color:var(--muted)}
+details.about summary{cursor:pointer;color:var(--link);font-weight:500}
+details.about p{margin-top:8px}
+
+/* pages */
+.page{padding:28px 28px 64px;max-width:1120px}
+.page h1{font-size:30px;margin-bottom:20px}
+.dash{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;align-items:start}
+.ccards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.ccard{background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.06);text-decoration:none;color:inherit}
+.ccard:hover{box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.ccard .hd{background:var(--usf);height:120px;position:relative;padding:16px;overflow:hidden;color:var(--usf-gold);font:800 22px/1 var(--h);display:flex;align-items:flex-end}
+.ccard .hd::after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;border:22px solid rgba(207,196,147,.35)}
+.ccard .bd{padding:14px 16px 16px;display:flex;flex-direction:column;gap:2px}
+.ccard .bd b{color:var(--link);font-size:17px}
+.ccard .bd span{font-size:14px;color:var(--muted)}
+.todo h2,.side h2{font:600 17px/1.2 var(--h);padding-bottom:10px;border-bottom:1px solid var(--line)}
+.todo button{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);width:100%}
+.todo button:hover b{text-decoration:underline}
+.todo .ico{color:var(--usf);margin-top:2px}
+.todo b{display:block;color:var(--link);font-weight:600;font-size:15px}
+.todo small{color:var(--muted);font-size:13.5px}
+.ico svg{width:20px;height:20px;display:block}
+
+/* course */
+.course{display:grid;grid-template-columns:210px minmax(0,1fr);align-items:start}
+.cnav{position:sticky;top:var(--barh);padding:22px 0 22px 18px;display:flex;flex-direction:column;gap:2px}
+.cnav button{padding:8px 12px;border-left:3px solid transparent;color:var(--link);font-size:15.5px}
+.cnav button:hover{text-decoration:underline}
+.cnav button[aria-current]{border-left-color:var(--usf);color:var(--ink);font-weight:600}
+.cmain{padding:26px 28px 64px;min-width:0;max-width:960px;display:flex;flex-direction:column;gap:22px}
+.cmain>h1{font-size:28px}
+.banner{background:var(--usf);color:#fff;border-radius:var(--radius);padding:26px 28px;display:flex;flex-direction:column;gap:6px;position:relative;overflow:hidden}
+.banner::after{content:"";position:absolute;right:-40px;bottom:-60px;width:220px;height:220px;border-radius:50%;border:30px solid rgba(207,196,147,.28)}
+.banner .code{color:var(--usf-gold);font-weight:700;font-size:14px}
+.banner h1{color:#fff;font-size:clamp(22px,2.6vw,30px);max-width:24em}
+.banner p{opacity:.9;max-width:44em}
+.home2{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:28px;align-items:start}
+.side{display:flex;flex-direction:column;gap:6px;font-size:15px}
+.side dl{display:flex;flex-direction:column;gap:2px}
+.side dt{color:var(--muted);font-size:13.5px;margin-top:10px}
+
+/* modules */
+.mod{background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.mod>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--paper);cursor:pointer;font-weight:600;border-bottom:1px solid var(--line)}
+.mod>summary::-webkit-details-marker{display:none}
+.mod>summary .chev{transition:transform .15s;color:var(--muted)}
+.mod[open]>summary .chev{transform:rotate(90deg)}
+.mod:not([open])>summary{border-bottom:0}
+.mod .now{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--usf-dd);background:var(--usf-gold);padding:3px 8px;border-radius:99px}
+.item{display:flex;align-items:center;gap:14px;padding:12px 16px;width:100%;min-height:52px;text-decoration:none;color:inherit}
+.item+.item{border-top:1px solid var(--line)}
+.item:hover{background:var(--paper)}
+.item .ico{color:var(--muted);flex:none}
+.item.lab .ico,.item.read .ico{color:var(--usf)}
+.item .t{display:flex;flex-direction:column;min-width:0}
+.item .t b{font-weight:500;color:var(--link)}
+.item .t small{color:var(--muted);font-size:13px}
+.item .r{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap;text-align:right}
+.item.locked{cursor:default}
+.item.locked .t b{color:var(--muted)}
+.item.lab{background:color-mix(in srgb,var(--usf-gold) 18%,var(--sheet))}
+.mods{display:flex;flex-direction:column;gap:16px}
+
+/* assignments, grades */
+.grp h2{font:600 16px/1.2 var(--h);padding:10px 16px;background:var(--paper);border:1px solid var(--line);border-bottom:0;border-radius:var(--radius) var(--radius) 0 0}
+.grp .list{background:var(--sheet);border:1px solid var(--line);border-radius:0 0 var(--radius) var(--radius)}
+.chip{display:inline-block;font-size:12.5px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.chip.go{background:var(--usf);color:#fff;border-color:var(--usf)}
+.chip.prog{background:var(--usf-gold-l);color:var(--ink);border-color:var(--usf-gold)}
+.chip.done{background:color-mix(in srgb,var(--gain) 14%,var(--sheet));color:var(--gain);border-color:color-mix(in srgb,var(--gain) 40%,var(--sheet))}
+table.t{width:100%;border-collapse:collapse;background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;font-size:15px;color:var(--ink)}
+table.t th{text-align:left;font-weight:600;font-size:13.5px;color:var(--muted);background:var(--paper);padding:10px 14px;border-bottom:1px solid var(--line)}
+table.t td{padding:11px 14px;border-top:1px solid var(--line);vertical-align:top}
+table.t .n{text-align:right;white-space:nowrap}
+.tw{overflow-x:auto}
+
+/* assignment page */
+.ahead{display:flex;flex-direction:column;gap:8px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.ahead h1{font-size:30px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px}
+.meta b{font-weight:600}
+.launch{display:flex;align-items:center;gap:20px;justify-content:space-between;flex-wrap:wrap;border:2px solid var(--usf);border-radius:var(--radius);padding:20px 22px;background:var(--sheet)}
+.launch h2{font-size:20px}
+.launch p{color:var(--muted);font-size:15px;margin-top:2px}
+.pbar{display:flex;gap:4px;margin-top:10px}
+.pbar i{width:28px;height:6px;border-radius:3px;background:var(--line)}
+.pbar i.on{background:var(--usf)}
+.sect{display:flex;flex-direction:column;gap:10px}
+.sect h2{font-size:19px}
+.steps{display:flex;flex-direction:column;gap:0;counter-reset:s;padding:0;list-style:none;border:1px solid var(--line);border-radius:var(--radius);background:var(--sheet)}
+.steps li{display:flex;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);counter-increment:s}
+.steps li:first-child{border-top:0}
+.steps li::before{content:counter(s);flex:none;width:28px;height:28px;border-radius:50%;background:var(--usf-gold-l);color:var(--usf-dd);display:grid;place-items:center;font-weight:700;font-size:14px;border:1px solid var(--usf-gold)}
+.steps li b{font-weight:600}
+details.fold{border:1px solid var(--line);border-radius:var(--radius);background:var(--sheet)}
+details.fold>summary{cursor:pointer;padding:12px 16px;font-weight:600}
+details.fold>div{padding:0 16px 16px}
+.callout{border-left:4px solid var(--usf-gold);background:var(--usf-gold-l);padding:12px 16px;border-radius:0 var(--radius) var(--radius) 0;font-size:15px}
+
+/* lab and readings */
+#deskSlot{min-height:60vh}
+#labBar{position:static}
+#compFrame{display:block;width:100%;height:calc(100vh - var(--barh));border:0;background:var(--paper)}
+
+/* instructor overview */
+.cols3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.cols3>div{background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.cols3 h3{font-size:16px;margin-bottom:8px}
+.cols3 ul{font-size:14.5px;display:flex;flex-direction:column;gap:4px}
+.ok{color:var(--gain)}.bad{color:var(--loss)}.warn{color:var(--warn)}
+code{font:500 13.5px/1.4 "IBM Plex Mono",ui-monospace,monospace;background:var(--paper);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+
+/* dialog */
+dialog{border:0;border-radius:12px;padding:0;max-width:min(520px,calc(100% - 32px));background:var(--sheet);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .dhd{background:var(--usf);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+dialog .dhd h2{color:#fff;font-size:18px}
+dialog .dbd{padding:18px 20px;display:flex;flex-direction:column;gap:10px;font-size:15px}
+
+/* phone and tablet */
+@media (max-width:900px){.dash,.home2{grid-template-columns:1fr}.cols3{grid-template-columns:1fr}}
+@media (max-width:760px){
+  :root{--navw:0px}
+  .shell{display:block}
+  .gnav{position:sticky;top:0;height:56px;flex-direction:row;align-items:stretch;padding:0;width:100%}
+  .gnav .logo{height:56px;width:64px;border:0;margin:0;font-size:16px}
+  .gn{flex-direction:row;justify-content:center;gap:6px;padding:0 10px;width:auto;font-size:13px}
+  .gn span{display:none}
+  .gn.on span,.gn .av+span{display:none}
+  .gnav .grow{flex:1}
+  .cbar{top:56px;padding:0 12px;height:52px}
+  .crumbs{font-size:14.5px}
+  .course{grid-template-columns:1fr}
+  .cnav{display:none;position:static;padding:8px 12px;border-bottom:1px solid var(--line);background:var(--sheet)}
+  body.cnavopen .cnav{display:flex}
+  .cmain,.page{padding:18px 16px 56px}
+  .lcard{grid-template-columns:1fr}
+  .lcourse,.lsign{padding:24px}
+  #compFrame{height:calc(100vh - 108px)}
+  .item .r{display:none}
+}
+@media (min-width:761px){.cbar .hamb.coursemenu{display:none}}
+</style>
+
+<div class="shell">
+  <nav class="gnav" id="gnav" aria-label="Global"></nav>
+  <div class="main">
+    <div id="app"></div>
+    <section id="labView" class="hidden"><header class="cbar" id="labBar"></header><div id="deskSlot"></div></section>
+    <section id="readView" class="hidden"><header class="cbar" id="readBar"></header><iframe id="compFrame" title="Course companion"></iframe></section>
+  </div>
+</div>
+<dialog id="aboutDlg" aria-labelledby="aboutH"><div class="dhd"><h2 id="aboutH">About this demo</h2><button class="btn gold" style="min-height:34px;padding:6px 12px" data-close>Close</button></div>
+  <div class="dbd"><p><b>Real:</b> the Discount Desk lab and its numbers from the course data, the course companion readings, and the case file students download.</p>
+  <p><b>Simulated:</b> this sign-in, the class roster, the course pages and due dates. Progress is saved only in this browser.</p>
+  <p><b>Not built yet:</b> launching from USF Canvas with a real account, and grades posting to Canvas.</p></div></dialog>
+
+<script>
+/*__DESK_STRINGS__*/
+function bootDesk(R,CTX){
+/*__DESK_JS__*/
+}
+</script>
+<script>
+/*__COMP_STRING__*/
+</script>
+<script>
+/* ---------------- course site ---------------- */
+const PEOPLE=[
+ {id:"avery",name:"Avery Brooks",letter:"B",section:"001",state:"Ohio",target:6500},
+ {id:"jordan",name:"Jordan Kim",letter:"K",section:"001",state:"Pennsylvania",target:5500},
+ {id:"maya",name:"Maya Ortiz",letter:"O",section:"001",state:"New York",target:20500},
+ {id:"sam",name:"Sam Torres",letter:"T",section:"001",state:"California",target:23000},
+ {id:"instructor",name:"Dr. Nasir Uddin",letter:"",section:"",state:"",teacher:true}];
+const NOW_WEEK=12;
+const CV="https://usflearn.instructure.com/courses/2065356/files/";
+const SP="https://usfedu-my.sharepoint.com/:v:/g/personal/nasir1_usf_edu/";
+/* module items: [kind, title, target]  kind: read | lab | asg | file | video | lock */
+const MODULES=[
+ {t:"Weeks 1–2: Welcome",items:[["read","Reading 1.1: Check the Number First","1a"],["file","Lecture deck: AI, Analytics & Agents",CV+"220282844"],["asg","Pre-Course Survey","survey"]]},
+ {t:"Weeks 2–3: Tool setup, API key",items:[["read","Reading 3.1: Your AI Key, Kept Safe","3a"],["file","How to get your AI model access",CV+"220517822"]]},
+ {t:"Weeks 3–4: Tool setup, Tableau & Make",items:[["video","Tool setup walkthrough",SP+"IQBPdvVcKv5tTKsXgCpa1LonAaAImTxxHCYxHDLsQ_shJX0?e=GG6H1u"],["asg","Tool Installation","tools"]]},
+ {t:"Week 4: First AI Simulation Lab",items:[["read","Reading 2.3: Evaluation and Human Responsibility","2c"],["video","Tutorial: exploring the AI Simulation Lab",SP+"IQBs75fpQY6xQIZsuwAhgYu0AVTLimiGklzbIBXEt7APc48?e=UwheZm"],["asg","Lab 1: From AI Output to Business Judgment","lab1"]]},
+ {t:"Week 5: Tableau and Make AI",items:[["read","Reading 3.2: Tableau and Make, Who Does What","3b"],["video","Introduction to Tableau and Make, part 1",SP+"IQBAVSLYE0LgTa-1yCgNckJcAcb52M48H-TYXjjOLrNxYH4?e=UBOmKd"],["video","Introduction to Tableau and Make, part 2",SP+"IQC7gpi6Gw29S6-kpq_zVKLSAQWC-wmoSOf4NlTBM5XpUQQ?e=UsbOYh"],["file","superstore_sales_processed.csv",CV+"221478554"],["asg","Tableau and Make AI Practice Lab","practice"]]},
+ {t:"Weeks 7–9: Descriptive & Diagnostic",items:[["read","Reading 4.1: Reconcile Before You Chart","4a"],["video","Descriptive and diagnostic walkthrough",SP+"IQCdLnd108ROT6NEPRDG-xOCAYzoK3VB9PkTaxEcB7mK1Zw?e=jKb80r"],["file","Lab answer sheet",CV+"223183592"],["asg","Lab: Descriptive and Diagnostic Analytics","dd"]]},
+ {t:"Weeks 9–10: Predictive & Prescriptive",items:[["read","Reading 5.1: Reading a Forecast","5a"],["video","Forecasting with a state target",SP+"IQAAFegzWNSDQoeOOVkE0pHpAfyPC3kWqfaOeFTbB-pmsPo?e=Zcfylx"],["video","What-if with a discount cap",SP+"IQDy-BrFgKQUTL4qdTIVPQV_ARX-oJs6ZjSMeOQD-UnLbls?e=xOwfHD"],["file","Lab answer sheet",CV+"223561354"],["asg","Lab: Predictive & Prescriptive Analytics","pp"]]},
+ {t:"Week 11: Dashboard Building",items:[["read","Reading 6.1: Design Before You Build","6a"],["video","Building a powerful dashboard",SP+"IQA2DFvW_F_MQKiOYuaRkDUVAZfEwm5BwJY3YAeUEJq5Fn0?e=BYK8A6"],["file","Dashboard wireframe template",CV+"229227828"],["asg","Design and Present Your Dashboard","dash"]]},
+ {t:"Week 12: Agentic AI",now:true,items:[["read","Reading 7.1: Workflow or Agent?","7a"],["read","Reading 7.2: Guardrails and the Human Gate","7b"],["file","Discount Guardrail template",CV+"229250934"],["lab","Discount Desk lab","desk"]]},
+ {t:"Weeks 13–14: Final project",items:[["read","Reading 8.1: What a Strong Project Proves","8a"],["lock","Final project checkpoint","final"]]}];
+const ASG={
+ survey:{g:"Course logistics",t:"Pre-Course Survey",due:"Aug 28",pts:10,st:"closed",kind:"Survey",d:"Tell us about your background with analytics, Tableau and generative AI."},
+ q1:{g:"Quizzes",t:"Quiz 1: Analytics, AI and Agents",due:"Sep 24",pts:20,st:"closed",kind:"Quiz",d:"Twenty questions on telling analytics, predictive AI, generative AI and agents apart."},
+ q2:{g:"Quizzes",t:"Quiz 2: How to Judge AI in Business",due:"Sep 27",pts:20,st:"closed",kind:"Quiz",d:"Covers the Lab 1 simulations."},
+ qdd:{g:"Quizzes",t:"Quiz: Descriptive and Diagnostic",due:"Oct 24",pts:20,st:"closed",kind:"Quiz",d:"Ten questions on the class charts."},
+ qpp:{g:"Quizzes",t:"Quiz: Predictive and Prescriptive",due:"Nov 10",pts:20,st:"closed",kind:"Quiz",d:"Ten questions on MASE, forecast ranges and the discount what-if."},
+ tools:{g:"Weekly labs",t:"Tool Installation",due:"Sep 22",pts:20,st:"closed",kind:"File upload",d:"Install Tableau Desktop and set up Make.com, then upload screenshots of both working."},
+ lab1:{g:"Weekly labs",t:"Lab 1: From AI Output to Business Judgment",due:"Sep 27",pts:100,st:"closed",kind:"File upload (PDF)",d:"Complete the AI Simulation Lab for one career area and upload the Portfolio Report."},
+ practice:{g:"Weekly labs",t:"Tableau and Make AI Practice Lab",due:"Oct 15",pts:100,st:"closed",kind:"File upload",d:"Rebuild the tutorial chart, run the Make workflow and check the report against your chart."},
+ dd:{g:"Weekly labs",t:"Lab: Descriptive and Diagnostic Analytics",due:"Oct 21",pts:100,st:"closed",kind:"Workbook and answer sheet",d:"Build four sheets from the Superstore data and answer the questions in the answer sheet."},
+ pp:{g:"Weekly labs",t:"Lab: Predictive & Prescriptive Analytics",due:"Nov 10",pts:100,st:"closed",kind:"Workbook and answer sheet",d:"Forecast monthly sales for your state against its target, then build the discount-cap what-if."},
+ dash:{g:"Weekly labs",t:"Design and Present Your Dashboard",due:"Nov 13",pts:100,st:"closed",kind:"Workbook, wireframe and video link",d:"Build a one-screen Sales & Profit dashboard for your state and record a short walkthrough."},
+ desk:{g:"Weekly labs",t:"Discount Desk lab",due:"Nov 23, 11:59 PM",pts:100,st:"open",kind:"Case file, workbook and answer sheet",lab:true,
+   d:"The VP of Sales wants two answers: will your state hit next year's target, and how do we stop discounts from losing money? Along the way you'll check an AI agent's decisions."},
+ final:{g:"Final project",t:"Final project checkpoint",due:"Week 13",pts:"TBA",st:"lock",kind:"Opens in Week 13",d:"Details will be posted in Week 13."}};
+const LAB_STEPS=[["Check the data","which total is real?"],["Forecast","will your state hit its target?"],["Set the cap","which discounts lose money?"],["Supervise the agent","approve, counter or escalate"],["Write the memo","catch the wrong number, then recommend"],["File the case","reflect and download"]];
+const RUBRIC=[["Check the data",10,10,0],["Forecast",20,12,8],["Set the cap",30,20,10],["Supervise the agent",20,20,0],["Write the memo",15,7,8],["File the case",5,0,5]];
+const OUTCOMES=["Verify a figure before relying on it","Read a forecast with its uncertainty, and judge it with MASE","Turn a what-if into a policy, and name the assumption behind it","Supervise an AI agent: apply policy, refuse misleading notes and injected instructions, escalate mismatches","Catch a fluent but wrong number, and write a recommendation whose numbers trace to evidence","Say where human judgment changed the outcome"];
+
+const ICON={
+ dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/></svg>',
+ course:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg>',
+ help:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.2-2.5 3.9"/><circle cx="12" cy="17.3" r=".6" fill="currentColor"/></svg>',
+ out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 4h4v16h-4"/><path d="M10 8l-4 4 4 4"/><path d="M6 12h10"/></svg>',
+ read:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h6a3 3 0 0 1 3 3v12a2.5 2.5 0 0 0-2.5-2.5H3z"/><path d="M21 5h-6a3 3 0 0 0-3 3v12a2.5 2.5 0 0 1 2.5-2.5H21z"/></svg>',
+ lab:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 3h6"/><path d="M10 3v6.5L4.6 18.4A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.6L14 9.5V3"/><path d="M7.5 15h9"/></svg>',
+ asg:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4"/><path d="M8.5 10h7M8.5 14h7M8.5 18h4"/></svg>',
+ file:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2h8l5 5v15H6z"/><path d="M14 2v5h5"/></svg>',
+ video:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3z"/></svg>',
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+ menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>',
+ chev:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>'};
+const ic=k=>`<span class="ico" aria-hidden="true">${ICON[k]||ICON.file}</span>`;
+
+const WK="usfdemo-v1";
+let W={who:null,view:"login",tab:"home",asg:null,read:null};
+try{const r=localStorage.getItem(WK);if(r)W=Object.assign(W,JSON.parse(r));}catch(e){}
+function wsave(){try{localStorage.setItem(WK,JSON.stringify(W));}catch(e){}}
+const prog={};
+function getProg(id){if(prog[id])return prog[id];try{const r=localStorage.getItem("usfdemo-prog-"+id);if(r)return prog[id]=JSON.parse(r);}catch(e){}return prog[id]={done:0,filed:false,code:""};}
+function setProg(id,p){prog[id]=p;try{localStorage.setItem("usfdemo-prog-"+id,JSON.stringify(p));}catch(e){}}
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=v=>"$"+Math.round(v).toLocaleString("en-US");
+const me=()=>PEOPLE.find(p=>p.id===W.who);
+const initials=n=>n.replace(/^Dr\.\s*/,"").split(" ").map(s=>s[0]).join("").slice(0,2);
+const app=document.getElementById("app");
+const PREVIEW=!!(window.claude&&window.claude.use);
+let shellCap={db:null,user:null};
+async function useCap(n){try{return window.claude&&window.claude.use?await window.claude.use(n):null}catch(e){return null}}
+function labStatus(p){if(!p||p.teacher)return null;const g=getProg(p.id);if(g.filed)return {cls:"done",txt:"Filed"};if(g.done>1)return {cls:"prog",txt:(g.done-1)+" of 6 steps"};return {cls:"go",txt:"Start"};}
+
+/* ---------- global nav and bars ---------- */
+function gnav(){const p=me();if(!p)return "";const v=W.view;
+  const b=(k,label,attrs,on)=>`<button class="gn ${on?"on":""}" ${attrs} ${on?'aria-current="page"':""}>${ICON[k]}<span>${label}</span></button>`;
+  return `<div class="logo" aria-label="University of South Florida">USF</div>
+    <button class="gn" data-act="about" title="${esc(p.name)}"><span class="av" aria-hidden="true">${esc(initials(p.name))}</span><span>Account</span></button>
+    ${b("dash","Dashboard",'data-nav="dash"',v==="dash")}
+    ${b("course","Courses",'data-nav="course"',["course","asg","lab","read","instructor"].includes(v))}
+    <span class="grow"></span>
+    ${b("help","Help",'data-act="about"',false)}
+    ${b("out","Sign out",'data-act="signout"',false)}`;}
+function crumbs(list,menu){return `${menu?`<button class="hamb coursemenu" data-act="cnav" aria-label="Course menu">${ICON.menu}</button>`:""}<nav class="crumbs" aria-label="Breadcrumb">${list.map(([l,v,x],i)=>(i?'<span class="sep" aria-hidden="true">›</span>':"")+(v?`<button data-nav="${v}" ${x?`data-x='${esc(JSON.stringify(x))}'`:""}>${esc(l)}</button>`:`<span class="here">${esc(l)}</span>`)).join("")}</nav>`;}
+function courseNav(cur){const p=me();const items=[["home","Home"],["modules","Modules"],["assignments","Assignments"],["grades","Grades"],["companion","Course companion"]].concat(p.teacher?[["overview","Lab overview"]]:[]);
+  return `<nav class="cnav" aria-label="Course">${items.map(([k,l])=>`<button data-tab="${k}" ${cur===k?'aria-current="page"':""}>${l}</button>`).join("")}</nav>`;}
+function coursePage(tab,title,body){return `<header class="cbar">${crumbs([["CAI 3801","course",{tab:"home"}],[title]],true)}</header>
+  <div class="course">${courseNav(tab)}<main class="cmain">${body}</main></div>`;}
+
+/* ---------- login ---------- */
+function vLogin(){return `<div class="login"><div class="lcard">
+  <section class="lcourse"><span class="seal" aria-hidden="true">USF</span>
+    <div><div class="code">CAI 3801 · Fall 2026 · Section 001</div><h1 style="margin-top:6px">Artificial Intelligence &amp; Analytics for Organizations</h1></div>
+    <p>Build an AI workflow that produces a real executive recommendation, and prove the numbers in it are right.</p>
+    <dl class="facts"><dt>Instructor</dt><dd>Dr. Nasir Uddin</dd><dt>Office hours</dt><dd>Thursdays 3:30–4:30 PM, CIS 2007</dd><dt>Help session</dt><dd>Weekdays 6–7 PM, online</dd></dl></section>
+  <section class="lsign"><h2>Sign in</h2><p class="soft">Pick a demo account. No password needed.</p>
+    <div class="accts">${PEOPLE.map(p=>`<button data-who="${p.id}"><span class="av ${p.teacher?"t":""}" aria-hidden="true">${esc(initials(p.name))}</span><span><b>${esc(p.name)}</b><small>${p.teacher?"Instructor":"Student"}</small></span><span class="go" aria-hidden="true">${ICON.chev}</span></button>`).join("")}</div>
+    <div class="lfoot"><button class="link" id="startTour">Take the 5-minute tour</button><button class="link" data-act="about">About this demo</button></div></section>
+  </div></div>`;}
+
+/* ---------- dashboard ---------- */
+function vDash(){const p=me();const s=labStatus(p);
+  const todo=p.teacher?[["asg","Discount Desk: lab overview","For instructors",'data-tab="overview"']]:[["lab","Discount Desk lab","Due Nov 23 · 100 points"+(s&&s.cls!=="go"?" · "+s.txt:""),'data-asg="desk"'],["read","Reading 7.2: Guardrails and the Human Gate","Week 12 reading",'data-read="7b"']];
+  return `<header class="cbar">${crumbs([["Dashboard"]])}</header><main class="page"><h1>Dashboard</h1>
+    <div class="dash"><div class="ccards"><button class="ccard" data-nav="course" data-x='{"tab":"home"}'><span class="hd" aria-hidden="true">CAI 3801</span><span class="bd"><b>CAI 3801: AI &amp; Analytics</b><span>CAI3801.001F26 · Fall 2026</span></span></button></div>
+    <aside class="todo"><h2>To do</h2>${todo.map(([k,t,sm,at])=>`<button ${at}>${ic(k)}<span><b>${esc(t)}</b><small>${esc(sm)}</small></span></button>`).join("")}</aside></div></main>`;}
+
+/* ---------- course pages ---------- */
+function itemRow(it){const [k,t,target]=it;const p=me();
+  if(k==="read")return `<button class="item read" data-read="${target}">${ic("read")}<span class="t"><b>${esc(t)}</b><small>Course companion</small></span></button>`;
+  if(k==="lab"){const s=labStatus(p);return `<button class="item lab" data-asg="${target}">${ic("lab")}<span class="t"><b>${esc(t)}</b><small>Due Nov 23 · 100 points</small></span>${s?`<span class="r"><span class="chip ${s.cls}">${esc(s.txt)}</span></span>`:""}</button>`;}
+  if(k==="asg"){const a=ASG[target];return `<button class="item" data-asg="${target}">${ic("asg")}<span class="t"><b>${esc(t)}</b><small>${esc(a.due)} · ${a.pts} pts</small></span></button>`;}
+  if(k==="lock")return `<div class="item locked">${ic("lock")}<span class="t"><b>${esc(t)}</b><small>Opens in Week 13</small></span></div>`;
+  return `<a class="item" href="${esc(target)}" target="_blank" rel="noopener">${ic(k)}<span class="t"><b>${esc(t)}</b><small>${k==="video"?"Lecture recording":"File"} · opens in USF Canvas</small></span><span class="r">↗</span></a>`;}
+function vHome(){const p=me();const cur=MODULES.find(m=>m.now);
+  return coursePage("home","Home",`<div class="banner"><span class="code">CAI 3801 · Fall 2026</span><h1>Artificial Intelligence &amp; Analytics for Organizations</h1><p>Week ${NOW_WEEK} of 14: Agentic AI</p></div>
+    <div class="home2"><section class="sect"><h2>This week</h2><div class="mod" style="border-radius:var(--radius)">${cur.items.map(itemRow).join("")}</div>
+      <p class="small soft">Labs and quizzes are due Mondays at 11:59 PM.</p></section>
+    <aside class="side"><h2>Instructor</h2><dl><dt>Name</dt><dd>Dr. Nasir Uddin</dd><dt>Office hours</dt><dd>Thursdays 3:30–4:30 PM, CIS 2007</dd><dt>Help session</dt><dd>Weekdays 6–7 PM, online</dd></dl></aside></div>`);}
+function vModules(){return coursePage("modules","Modules",`<h1>Modules</h1><div class="mods">${MODULES.map(m=>`<details class="mod" ${m.now||W.openAll?"open":""}><summary><span class="chev" aria-hidden="true">${ICON.chev}</span>${esc(m.t)}${m.now?'<span class="now">This week</span>':""}</summary>${m.items.map(itemRow).join("")}</details>`).join("")}</div>`);}
+function vAssignments(){const p=me();const groups={};Object.entries(ASG).forEach(([id,a])=>(groups[a.g]=groups[a.g]||[]).push([id,a]));
+  const order=["Weekly labs","Quizzes","Final project","Course logistics"];
+  return coursePage("assignments","Assignments",`<h1>Assignments</h1>${order.filter(g=>groups[g]).map(g=>`<section class="grp"><h2>${esc(g)}</h2><div class="list">${groups[g].map(([id,a])=>{const s=a.lab?labStatus(p):null;
+    return a.st==="lock"?`<div class="item locked">${ic("lock")}<span class="t"><b>${esc(a.t)}</b><small>${esc(a.due)}</small></span></div>`:`<button class="item ${a.lab?"lab":""}" data-asg="${id}">${ic(a.lab?"lab":"asg")}<span class="t"><b>${esc(a.t)}</b><small>Due ${esc(a.due)} · ${a.pts} pts</small></span>${s?`<span class="r"><span class="chip ${s.cls}">${esc(s.txt)}</span></span>`:a.st==="closed"?'<span class="r">Closed</span>':""}</button>`;}).join("")}</div></section>`).join("")}`);}
+function vGrades(){const p=me();const g=p.teacher?null:getProg(p.id);
+  return coursePage("grades","Grades",`<h1>Grades</h1><div class="tw"><table class="t"><tr><th>Assignment</th><th>Due</th><th class="n">Score</th></tr>
+    ${Object.entries(ASG).filter(([,a])=>a.st!=="lock").map(([id,a])=>`<tr><td>${a.lab?`<button class="link" data-asg="desk">${esc(a.t)}</button>`:esc(a.t)}</td><td class="soft">${esc(a.due)}</td><td class="n">${a.lab?(g&&g.filed?"Filed":g&&g.done>1?"In progress":"–"):"–"} / ${a.pts}</td></tr>`).join("")}
+    </table></div><p class="small soft">Demo: scores aren't real. In this version your instructor grades the uploaded case file.</p><div class="tw"><table class="t" style="max-width:420px"><tr><th>Weight</th><th class="n"></th></tr><tr><td>Weekly labs</td><td class="n">40%</td></tr><tr><td>Final project</td><td class="n">40%</td></tr><tr><td>Quizzes</td><td class="n">10%</td></tr><tr><td>Participation</td><td class="n">10%</td></tr></table></div>`);}
+
+/* ---------- assignment ---------- */
+function vAsg(){const p=me(),id=W.asg,a=ASG[id];if(!a){W.view="course";W.tab="assignments";return vAssignments();}
+  let body=`<div class="ahead"><h1>${esc(a.t)}</h1><div class="meta"><span><b>Due</b> ${esc(a.due)}</span><span><b>Points</b> ${a.pts}</span><span><b>Submitting</b> ${esc(a.kind)}</span></div></div>
+    <p style="max-width:62ch">${esc(a.d)}</p>`;
+  if(a.lab){const g=p.teacher?null:getProg(p.id);const done=g?Math.max(0,g.done-1):0;
+    body+=`<div class="launch"><div><h2>${p.teacher?"Preview the lab":g&&g.filed?"Your case is filed":done?"Continue your case":"Start the lab"}</h2>
+      <p>${p.teacher?"Opens with a preview account.":g&&g.filed?"Upload the case file to Canvas if you haven't.":done?done+" of 6 steps done":"About 60–90 minutes. Have your Lab 2 Tableau workbook open."}</p>
+      ${g?`<div class="pbar" aria-label="${done} of 6 steps done">${Array.from({length:6},(_,i)=>`<i class="${i<done?"on":""}"></i>`).join("")}</div>`:""}</div>
+      <button class="btn" id="startLab">${p.teacher?"Preview":done?"Continue":"Start"}</button></div>
+    <section class="sect"><h2>Steps</h2><ol class="steps">${LAB_STEPS.map(([t,s])=>`<li><span><b>${t}</b>: ${s}</span></li>`).join("")}</ol></section>
+    <section class="sect"><h2>To submit</h2><ol class="steps"><li><span>Download your case file on the last step.</span></li><li><span>Upload it here with your <code>.twbx</code> workbook and answer sheet.</span></li><li><span>Write your verification code on the answer sheet.</span></li></ol></section>
+    <div class="callout">Need a concept first? Start with <button class="link" data-read="7b">Reading 7.2: Guardrails and the Human Gate</button>. Each lab step also links to its reading.</div>
+    <details class="fold"><summary>Grading</summary><div><div class="tw"><table class="t"><tr><th>Step</th><th class="n">Points</th></tr>${RUBRIC.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td></tr>`).join("")}<tr><td><b>Total</b></td><td class="n"><b>100</b></td></tr></table></div></div></details>`;}
+  else body+=`<div class="callout">${a.st==="closed"?"This assignment is closed.":"Submitted in Canvas as usual."} Only the Discount Desk lab runs inside this demo.</div>`;
+  return `<header class="cbar">${crumbs([["CAI 3801","course",{tab:"home"}],["Assignments","course",{tab:"assignments"}],[a.t]],true)}</header>
+    <div class="course">${courseNav("assignments")}<main class="cmain">${body}</main></div>`;}
+
+/* ---------- instructor overview ---------- */
+function vOverview(){return coursePage("overview","Lab overview",`<h1>Discount Desk: lab overview</h1>
+  <p style="max-width:66ch">A one-sitting case that builds on Lab 2. Students check the data, forecast against a target, set discount caps, supervise an AI agent that applies them, and file a signed recommendation to Canvas.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="startTour">Take the tour</button><button class="btn alt" id="previewLab">Preview as a student</button></div>
+  <section class="sect"><h2>What students learn</h2><ol class="steps">${OUTCOMES.map(o=>`<li><span>${esc(o)}</span></li>`).join("")}</ol></section>
+  <section class="sect"><h2>Grading</h2><div class="tw"><table class="t"><tr><th>Step</th><th class="n">Script</th><th class="n">Instructor</th><th class="n">Points</th></tr>${RUBRIC.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[2]||""}</td><td class="n">${r[3]||""}</td><td class="n">${r[1]}</td></tr>`).join("")}<tr><td><b>Total</b></td><td class="n">69</td><td class="n">31</td><td class="n"><b>100</b></td></tr></table></div>
+    <p class="small soft">Run <code>node grader/grade.js submissions.zip</code> on a Canvas "Download Submissions" zip. It recomputes the 69 script points on your computer, never opens the uploaded files, and writes a grade sheet, a review sheet and a class report. Nothing posts to Canvas by itself.</p></section>
+  <section class="sect"><h2>What this version can do</h2><div class="cols3">
+    <div><h3 class="ok">Works now</h3><ul><li>The whole lab, for each assigned state</li><li>Readings linked to each step</li><li>Case file with a data block for grading</li><li>Local grading script and class report</li></ul></div>
+    <div><h3 class="warn">Simulated</h3><ul><li>Sign-in and roster</li><li>Course pages and due dates</li></ul></div>
+    <div><h3 class="bad">Needs USF Canvas</h3><ul><li>Real sign-in (LTI 1.3)</li><li>Grades posting to Canvas</li><li>Progress across devices</li></ul></div></div></section>
+  <section class="sect" id="filedWrap"><h2>Filed cases</h2><div id="filed"><p class="soft">${PREVIEW?"Loading…":"Students upload their case file to Canvas."}</p></div></section>`);}
+
+/* ---------- lab ---------- */
+let deskFor=null;
+function mountDesk(ctx){const slot=document.getElementById("deskSlot");slot.innerHTML="";const host=document.createElement("div");slot.appendChild(host);
+  const root=host.attachShadow({mode:"open"});root.innerHTML="<style>"+DESK_CSS+"</style>"+DESK_MARKUP;bootDesk(root,ctx);deskFor=ctx.id;return root;}
+function showPane(which){app.classList.toggle("hidden",which!=="app");document.getElementById("labView").classList.toggle("hidden",which!=="lab");document.getElementById("readView").classList.toggle("hidden",which!=="read");}
+function openLab(step){const p=me();if(!p){nav("login");return;}const ctx=p.teacher?{id:"instructor-preview",name:"",letter:"",section:""}:{id:p.id,name:p.name,letter:p.letter,section:p.section};
+  if(step!=null){ctx.step=step;deskFor=null;}
+  ctx.openReading=h=>openReading(h);
+  W.view="lab";wsave();renderGnav();
+  document.getElementById("labBar").innerHTML=crumbs([["CAI 3801","course",{tab:"home"}],["Assignments","course",{tab:"assignments"}],["Discount Desk lab","asg",{asg:"desk"}],[p.teacher?"Preview":"Lab"]]);
+  showPane("lab");
+  if(deskFor!==ctx.id){ctx.onProgress=S=>{if(p.teacher)return;const done=Object.keys(S.done||{}).length;setProg(p.id,{done,filed:!!S.submittedAt,code:""});};mountDesk(ctx);}
+  window.scrollTo(0,0);}
+function openTour(){W.view="tour";wsave();renderGnav();
+  document.getElementById("labBar").innerHTML=crumbs([[me()?"CAI 3801":"Sign in",me()?"course":"login",me()?{tab:"home"}:null],["Guided tour"]]);
+  showPane("lab");mountDesk({id:"tour",tour:true,onTourEnd:()=>{if(!me())W.who="avery";deskFor=null;openLab();}});window.scrollTo(0,0);}
+
+/* ---------- readings (the companion, inside this page) ---------- */
+let compReady=false,compPending=null;
+function openReading(hash){const p=me();if(!p){nav("login");return;}W.view="read";W.read=hash||null;wsave();renderGnav();
+  document.getElementById("readBar").innerHTML=crumbs([["CAI 3801","course",{tab:"home"}],["Course companion"]],true);
+  showPane("read");const f=document.getElementById("compFrame");
+  if(!f.dataset.loaded){f.dataset.loaded="1";compPending=hash||null;f.addEventListener("load",()=>{compReady=true;if(compPending)sendReading(compPending);compPending=null;},{once:true});f.srcdoc=COMP_HTML;}
+  else if(compReady&&hash)sendReading(hash);else compPending=hash||null;
+  window.scrollTo(0,0);}
+function sendReading(h){try{const cw=document.getElementById("compFrame").contentWindow;if(cw&&cw.CompanionAPI)cw.CompanionAPI.open(h);}catch(e){}}
+let shellSampleP=null;
+function shellSample(){if(!shellSampleP)shellSampleP=useCap("sample");return shellSampleP;}
+window.LS_sample={
+  ready:async()=>!!(await shellSample()),
+  ask:async(input,opts)=>{const s=await shellSample();if(!s)throw {code:"not_granted",message:"Claude is not available on this page."};
+    const i=typeof input==="string"?String(input):JSON.parse(JSON.stringify(input));
+    const o={};if(opts){if(opts.modelTier)o.modelTier=String(opts.modelTier);if(opts.cache===false)o.cache=false;if(typeof opts.onText==="function"){const f=opts.onText;o.onText=u=>{try{f({text:u.text,delta:u.delta});}catch(e){}};}}
+    return s(i,o);}};
+window.LS={sampleReady:()=>window.LS_sample.ready(),sample:(i,o)=>window.LS_sample.ask(i,o),openLab:step=>{W.asg="desk";openLab(step==null?null:+step);},openReading:h=>openReading(h)};
+
+/* ---------- instructor filed list (claude.ai preview only) ---------- */
+let unsubFiled=null;
+async function loadFiled(){const box=document.getElementById("filed");if(!box||!PREVIEW)return;
+  if(!shellCap.db){box.innerHTML='<p class="soft">Filed cases appear here once students file from the lab.</p>';return;}
+  let canEdit=false;try{canEdit=shellCap.user?await shellCap.user.canEdit():false;}catch(e){}
+  if(!canEdit){box.innerHTML='<p class="soft">Only editors of this page see filed cases.</p>';return;}
+  if(unsubFiled)unsubFiled();
+  unsubFiled=shellCap.db.collection("submissions").orderBy("filedAt","desc").onSnapshot(snap=>{const b=document.getElementById("filed");if(!b)return;const rows=snap.docs.map(d=>d.data());
+    b.innerHTML=rows.length?`<div class="tw"><table class="t"><tr><th>Student</th><th>State</th><th>Code</th><th>Requests</th></tr>${rows.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.state)}</td><td>${esc(r.code)}</td><td>${esc(r.guardrail)}</td></tr>`).join("")}</table></div>`:'<p class="soft">No cases filed yet.</p>';},
+    ()=>{const b=document.getElementById("filed");if(b)b.innerHTML='<p class="soft">Unavailable in this view.</p>';});}
+
+/* ---------- router ---------- */
+function renderGnav(){document.getElementById("gnav").innerHTML=gnav();document.body.classList.toggle("out",!me());}
+function nav(view,extra){Object.assign(W,{view},extra||{});wsave();document.body.classList.remove("cnavopen");show();window.scrollTo(0,0);const h=app.querySelector("h1");if(h){h.setAttribute("tabindex","-1");h.focus({preventScroll:true});}}
+function show(){if(!me()&&W.view!=="tour")W.view="login";
+  renderGnav();
+  if(W.view==="lab"){openLab();return;}
+  if(W.view==="tour"){openTour();return;}
+  if(W.view==="read"){openReading(W.read);return;}
+  showPane("app");
+  const tab=W.tab||"home";
+  app.innerHTML=W.view==="login"?vLogin():W.view==="dash"?vDash():W.view==="asg"?vAsg():tab==="modules"?vModules():tab==="assignments"?vAssignments():tab==="grades"?vGrades():tab==="overview"&&me().teacher?vOverview():vHome();
+  const t=app.querySelector("#startTour");if(t)t.onclick=openTour;
+  const pv=app.querySelector("#previewLab");if(pv)pv.onclick=()=>{W.asg="desk";openLab();};
+  const sl=app.querySelector("#startLab");if(sl)sl.onclick=()=>openLab();
+  if(app.querySelector("#filed"))loadFiled();}
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-close]");if(c){c.closest("dialog").close();return;}
+  const act=e.target.closest("[data-act]");
+  if(act){const a=act.dataset.act;
+    if(a==="about"){document.getElementById("aboutDlg").showModal();return;}
+    if(a==="signout"){W.who=null;deskFor=null;nav("login");return;}
+    if(a==="cnav"){document.body.classList.toggle("cnavopen");return;}}
+  const who=e.target.closest("[data-who]");if(who){W.who=who.dataset.who;deskFor=null;nav("dash");return;}
+  const rd=e.target.closest("[data-read]");if(rd){openReading("r-"+rd.dataset.read);return;}
+  const tb=e.target.closest("[data-tab]");if(tb){if(tb.dataset.tab==="companion"){openReading(null);return;}nav("course",{tab:tb.dataset.tab});return;}
+  const n=e.target.closest("[data-nav]");if(n){let x={};try{x=n.dataset.x?JSON.parse(n.dataset.x):{};}catch(_){}if(n.dataset.nav==="course"&&!x.tab)x.tab="home";if(n.dataset.nav==="asg"){nav("asg",x);return;}nav(n.dataset.nav,x);return;}
+  const a=e.target.closest("[data-asg]");if(a&&!a.closest("#deskSlot")){nav("asg",{asg:a.dataset.asg});return;}
+});
+show();
+(async()=>{const [db,user]=await Promise.all([useCap("db"),useCap("user")]);shellCap={db,user};if(document.getElementById("filed"))loadFiled();})();
+</script>

@@ -1,0 +1,34 @@
+# Student submissions and grading output must never be committed
+submissions/
+grading-output/
+*.zip
+grades*.csv
+review.html
+class-report.html
+class-counts.csv
+
+# Local backups and scratch
+*-backup.html
+*-backup.js
+*.tar.gz
+~$*
+
+# Built output (start-local and build-site.js make it) and local data
+site/
+# An older exported copy made by another tool (it has its own repository)
+sites/
+data/
+.env
+.env.*
+!.env.example
+*.v2-backup.html
+*.v3-backup.html
+embed-test.html
+image*.png
+node_modules/
+.DS_Store
+Thumbs.db
+.claude/
+
+# Local browser-test output
+.playwright-mcp/

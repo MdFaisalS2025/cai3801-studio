@@ -1,0 +1,370 @@
+<title>CAI 3801 Studio Blueprint</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* A design brief for a USF course platform: green masthead, numbered decisions with evidence, citations as footnotes. */
+:root{
+  --bg:#f5f6f4; --sheet:#ffffff; --ink:#1b1f1d; --muted:#59605c; --line:#dde2df; --usf:#006747; --usf-d:#00543a; --gold:#cfc493; --gold-l:#f3f0dd; --gold-t:#6f6527; --warn:#955a00; --bad:#b3342a;
+  --h:"Archivo",ui-sans-serif,system-ui,sans-serif; --b:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif; --m:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111412;--sheet:#181c1a;--ink:#e8ebe9;--muted:#a3aba6;--line:#2c322f;--usf:#3fae80;--usf-d:#2f9e6f;--gold-l:#2b2a1d;--gold-t:#cfc493;--warn:#f0b05a;--bad:#ef7d70;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111412;--sheet:#181c1a;--ink:#e8ebe9;--muted:#a3aba6;--line:#2c322f;--usf:#3fae80;--usf-d:#2f9e6f;--gold-l:#2b2a1d;--gold-t:#cfc493;--warn:#f0b05a;--bad:#ef7d70;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.62 var(--b);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.mast{background:#006747;color:#fff;margin-top:calc(-1 * env(safe-area-inset-top,0px));padding-top:calc(env(safe-area-inset-top,0px) + 44px);padding-bottom:40px}
+header.mast .k{color:#cfc493;font-weight:600;font-size:14px}
+header.mast h1{font:800 clamp(30px,4.6vw,48px)/1.08 var(--h);margin:10px 0 14px;color:#fff;text-wrap:balance}
+header.mast p{max-width:62ch;margin:0;font-size:17px;opacity:.93}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.links a{display:inline-flex;align-items:center;gap:8px;background:#cfc493;color:#003d2a;font-weight:600;text-decoration:none;padding:10px 16px;border-radius:7px}
+.links a.alt{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.5)}
+nav.toc{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--sheet);border-bottom:1px solid var(--line)}
+nav.toc .wrap{display:flex;gap:4px 18px;overflow-x:auto;padding-block:10px;font-size:14px;white-space:nowrap}
+nav.toc a{color:var(--muted);text-decoration:none}nav.toc a:hover{color:var(--usf)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sheet)}
+main.wrap{padding-block:30px 80px;display:flex;flex-direction:column;gap:44px}
+section{display:flex;flex-direction:column;gap:14px;scroll-margin-top:60px}
+h2{font:700 26px/1.2 var(--h);margin:0;text-wrap:balance}
+h2 .n{color:var(--gold-t);font-size:18px;display:block;margin-bottom:4px;font-family:var(--b);font-weight:600}
+h3{font:700 18px/1.25 var(--h);margin:8px 0 0}
+p{margin:0;max-width:72ch}
+ul,ol{margin:0;padding-left:22px;max-width:76ch}li{margin:4px 0}
+a{color:var(--usf)}
+sup a{text-decoration:none;font-size:12px;font-weight:600;padding:0 1px}
+.lead{font-size:17.5px}
+.box{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.callout{border-left:4px solid #cfc493;background:var(--gold-l);padding:12px 16px;border-radius:0 8px 8px 0;max-width:78ch}
+.callout.risk{border-left-color:var(--bad)}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th{text-align:left;font-weight:600;font-size:13px;color:var(--muted);background:var(--bg);padding:9px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-top:1px solid var(--line);vertical-align:top}
+td.c{text-align:center}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--usf)}
+code{font:500 13.5px var(--m);background:var(--bg);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.box h3{margin-top:0}
+.tag{display:inline-block;font-size:12.5px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--line);background:var(--bg);color:var(--muted)}
+.tag.ok{color:var(--usf);border-color:var(--usf)}
+pre.mermaid{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:16px;overflow-x:auto;margin:0}
+ol.src{font-size:13.5px;color:var(--muted);columns:2;column-gap:32px}
+ol.src li{break-inside:avoid;margin:0 0 6px}
+ol.src a{word-break:break-all}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}ol.src{columns:1}}
+</style>
+
+<header class="mast"><div class="wrap">
+  <span class="k">CAI 3801 · AI &amp; Analytics for Organizations · USF · November 2026</span>
+  <h1>CAI 3801 Studio: a standalone, gamified AI &amp; analytics platform</h1>
+  <p>A research-backed plan for a course platform outside Canvas. Weekly lessons build named competencies, an AI tutor supports learning without doing the work, and grading pairs an AI first pass with a human decision. Built on Google Cloud.</p>
+  <div class="links"><a href="https://claude.ai/artifact/KY8E8gV3uaAYUtuY6oshvR" target="_blank" rel="noopener">Open the working prototype ↗</a><a class="alt" href="#plan">Jump to the build plan</a></div>
+</div></header>
+<nav class="toc" aria-label="Sections"><div class="wrap">
+  <a href="#decisions">Decisions</a><a href="#peers">Top schools</a><a href="#lessons">Weekly lessons</a><a href="#game">Gamification</a><a href="#personas">Personas</a><a href="#tracking">Tracking</a><a href="#tutor">AI tutor</a><a href="#prompting">Prompting</a><a href="#grading">Hybrid grading</a><a href="#agentic">Agentic skills</a><a href="#arch">Architecture</a><a href="#models">Models</a><a href="#mcp">MCP</a><a href="#privacy">Privacy</a><a href="#plan">Build plan</a><a href="#open">Open questions</a><a href="#sources">Sources</a>
+</div></nav>
+
+<main class="wrap">
+
+<section id="summary">
+  <p class="lead">The professor asked for eleven things. Each has a design decision below, the evidence behind it, and where it already runs in the prototype. Three findings shaped the design more than any others.</p>
+  <div class="grid3">
+    <div class="box"><h3>Guardrails decide whether AI tutors help</h3><p>An unrestricted chatbot raised practice scores by 48% but cut exam scores by 17%. The same model with hints instead of answers removed the harm.<sup><a href="#s9">9</a></sup> A course-grounded tutor outperformed in-class active learning in a Harvard trial.<sup><a href="#s8">8</a></sup></p></div>
+    <div class="box"><h3>Gamification helps, modestly, if it rewards mastery</h3><p>Meta-analyses find small to medium positive effects (g ≈ 0.25 to 0.50).<sup><a href="#s1">1</a><a href="#s2">2</a></sup> Rewards for completion alone can undermine motivation,<sup><a href="#s6">6</a></sup> and effects fade after about four weeks without a refresh.<sup><a href="#s7">7</a></sup></p></div>
+    <div class="box"><h3>AI grading is uneven across tasks</h3><p>Agreement with human graders ranges from near-human to poor, worst on analytic, judgment-heavy criteria.<sup><a href="#s20">20</a><a href="#s21">21</a></sup> So AI suggests, a TA decides, and each criterion must pass a calibration bar first.<sup><a href="#s23">23</a></sup></p></div>
+  </div>
+</section>
+
+<section id="decisions"><h2><span class="n">The eleven asks</span>Decisions at a glance</h2>
+<div class="tw"><table><tr><th>Ask</th><th>Decision</th><th>In the prototype</th></tr>
+<tr><td>1. Practical, industry-aligned learning</td><td>Every week is a client-style brief with a workplace deliverable (memo, dashboard, automation, demo) feeding a portfolio. Skills mirror employer demand: analytical thinking, AI and data literacy, communication, automation.<sup><a href="#s14">14</a><a href="#s15">15</a></sup></td><td><span class="tag ok">Weekly quests</span></td></tr>
+<tr><td>2. Gamification</td><td>XP, levels, badges and week-based streaks; feedback is the main reward. No public individual leaderboard; team quests and a season refresh around week 5.</td><td><span class="tag ok">XP, levels, badges, quest rings</span></td></tr>
+<tr><td>3. Student, TA, faculty</td><td>Three role-based views on one data model, with permissions enforced on the server.</td><td><span class="tag ok">All three personas</span></td></tr>
+<tr><td>4. Activity tracking and recommendations</td><td>xAPI-style events; transparent rules that always say why; graded work weighted above clicks.<sup><a href="#s12">12</a></sup></td><td><span class="tag ok">Next steps with reasons</span></td></tr>
+<tr><td>5. Agentic skills</td><td>Eight named skills taught in weeks 11 to 14, from tool design to evaluation and cost.</td><td><span class="tag ok">Skills page, weeks 11–14</span></td></tr>
+<tr><td>6. MCP integration</td><td>A course MCP server with seven permissioned tools; Google-managed MCP servers for BigQuery, Firestore and Sheets.<sup><a href="#s30">30</a></sup></td><td><span class="tag ok">Settings page; server in the backend</span></td></tr>
+<tr><td>7. Open-source or USF LLM</td><td>One provider interface: Gemini by default, Gemma 4 or gpt-oss as open options, any OpenAI-compatible endpoint for a USF-hosted model.</td><td><span class="tag ok">Model selector</span></td></tr>
+<tr><td>8. GCP-centric</td><td>Cloud Run, Firestore, Pub/Sub to BigQuery, Cloud Storage, Identity Platform, Agent Platform (formerly Vertex AI).</td><td>Terraform and services in the backend</td></tr>
+<tr><td>9. Competencies every week</td><td>Each lesson targets two or three of eight competencies with observable weekly evidence, scored on a VALUE-style scale.<sup><a href="#s16">16</a></sup></td><td><span class="tag ok">Planner and skills radar</span></td></tr>
+<tr><td>10. Hybrid grading</td><td>AI suggests per criterion with quoted evidence and confidence; the TA confirms every score; uncertain cases go to faculty; students can request a full human review.</td><td><span class="tag ok">Queue, calibration, appeals</span></td></tr>
+<tr><td>11. AI tutor</td><td>Socratic by default, grounded in course readings, cites them, never solves graded work; judged by unaided performance.</td><td><span class="tag ok">Tutor (Claude on claude.ai)</span></td></tr>
+</table></div></section>
+
+<section id="peers"><h2><span class="n">What leading schools do</span>Ideas borrowed, and where they live</h2>
+<div class="tw"><table><tr><th>School</th><th>What they do</th><th>In the Studio</th></tr>
+<tr><td>Harvard CS50</td><td>Course-grounded "Duck" tutor with guardrails; staff can endorse or fix AI answers; 88% of course answers correct; about $1.90 per student a month<sup><a href="#s55">55</a></sup></td><td>AI tutor grounded in readings; TA sees tutor topics</td></tr>
+<tr><td>Harvard Business School</td><td>Required AI course; students design and deploy their own agents<sup><a href="#s56">56</a></sup></td><td>Agent Builder</td></tr>
+<tr><td>Wharton</td><td>AI role-play simulations, always followed by a debrief: what happened, what would you change<sup><a href="#s57">57</a></sup></td><td>Client meeting with an AI-played VP</td></tr>
+<tr><td>Stanford, MIT</td><td>Students verify and critique AI output against sources<sup><a href="#s58">58</a><a href="#s59">59</a></sup></td><td>Prompt Lab answer check</td></tr>
+<tr><td>Harvard, CMU, MIT</td><td>AI rules set per assignment; students disclose how they used AI; no AI detectors<sup><a href="#s60">60</a><a href="#s61">61</a><a href="#s59">59</a></sup></td><td>AI rule on every activity; AI-use question on every submission</td></tr>
+<tr><td>Berkeley CS 61A</td><td>One- or two-sentence hints, never answers; forum questions fell 75%, but 20% of hints were wrong<sup><a href="#s62">62</a></sup></td><td>Tutor gives hints; TA checks</td></tr>
+<tr><td>Georgia Tech</td><td>Jill Watson answers only from verified course content: 79% correct vs 31% for a generic assistant<sup><a href="#s63">63</a></sup></td><td>Tutor answers only from readings</td></tr></table></div>
+<h3>Practice tools, and why</h3>
+<div class="tw"><table><tr><th>Tool</th><th>What students do</th><th>Evidence</th></tr>
+<tr><td>Prompt Lab</td><td>Write a prompt for a real brief, run it, then check every number in the answer</td><td>Teaching clear requirements gave a 20% gain; prompt tricks gave 1%<sup><a href="#s64">64</a></sup></td></tr>
+<tr><td>Tool Trainer</td><td>Put real Tableau and Make steps in order; a hint locks the first step after two misses</td><td>Step-ordering (Parsons) practice is as effective as building from scratch, and faster<sup><a href="#s65">65</a></sup></td></tr>
+<tr><td>Agent Builder</td><td>Switch guardrails, pick a model, run 10 tests, compare accuracy, money lost and cost</td><td>Start simple, test with real failure cases, track cost<sup><a href="#s66">66</a><a href="#s67">67</a></sup></td></tr>
+<tr><td>Client meeting</td><td>Interview an AI-played VP in 6 questions, write a one-line brief, debrief</td><td>Wharton simulations with structured debriefs<sup><a href="#s57">57</a></sup></td></tr></table></div>
+<p class="callout">Writing rules used for every screen: the key point first, short sentences, about half the words of a first draft, one action per screen, help where it's needed instead of a tutorial.<sup><a href="#s68">68</a><a href="#s69">69</a></sup></p></section>
+
+<section id="lessons"><h2><span class="n">Ask 9</span>Weekly lessons that build competencies</h2>
+<p>Every week has the same rhythm: read, check, build, reflect. The build is the graded evidence. Each week names the competencies it builds, so students and faculty can see coverage across the term.</p>
+<div class="tw"><table><tr><th>Competency</th><th>Weekly evidence a grader can see</th><th>Framework</th></tr>
+<tr><td>Critical thinking</td><td>An assumptions log for each forecast or what-if: two assumptions, their data source, one alternative explanation</td><td>AAC&amp;U VALUE<sup><a href="#s16">16</a></sup></td></tr>
+<tr><td>Design thinking</td><td>A stakeholder need statement, a prototype (dashboard sketch or Make flow), one round of feedback and the change made</td><td>d.school modes<sup><a href="#s17">17</a></sup></td></tr>
+<tr><td>Computational thinking</td><td>The workflow broken into steps, a debugging log (bug, cause, fix), a reused component credited</td><td>Wing; Brennan &amp; Resnick<sup><a href="#s18">18</a></sup></td></tr>
+<tr><td>Creativity</td><td>Three distinct options with a risk note for each, and the choice justified</td><td>AAC&amp;U VALUE<sup><a href="#s16">16</a></sup></td></tr>
+<tr><td>Communication</td><td>A 150-word executive memo or one-chart storyboard for a named reader</td><td>AAC&amp;U VALUE<sup><a href="#s16">16</a></sup></td></tr>
+<tr><td>AI &amp; analytics concepts</td><td>Why a model or output could be wrong (data, bias, uncertainty), with an error metric</td><td>UNESCO, Digital Promise<sup><a href="#s19">19</a></sup></td></tr>
+<tr><td>Agentic AI skills</td><td>A delegation decision, a guardrail spec, an evaluation result, a cost estimate</td><td>See below</td></tr>
+<tr><td>Responsible AI</td><td>Disclosure of AI use and a short reflection on where human judgment changed the outcome</td><td>AI Fluency 4D<sup><a href="#s19">19</a></sup></td></tr></table></div>
+<p class="callout">The prototype's <b>Lesson planner</b> shows all 14 weeks against these eight competencies and counts coverage, so a gap (any competency in fewer than three weeks) is visible before the term starts.</p></section>
+
+<section id="game"><h2><span class="n">Ask 2</span>Gamification that supports learning</h2>
+<div class="grid2">
+ <div class="box"><h3>What the evidence supports</h3><ul>
+  <li>Small to medium gains: cognitive g = .49, motivational g = .36, behavioral g = .25.<sup><a href="#s1">1</a></sup> Academic performance g = 0.50.<sup><a href="#s2">2</a></sup></li>
+  <li>Badges and performance graphs raise competence; teams and story raise relatedness. No element adds autonomy, so give students choices.<sup><a href="#s5">5</a></sup></li>
+  <li>Collaboration combined with friendly competition works best.<sup><a href="#s1">1</a></sup></li>
+  <li>Positive, specific feedback increases intrinsic motivation.<sup><a href="#s6">6</a></sup></li></ul></div>
+ <div class="box"><h3>What backfires</h3><ul>
+  <li>Rewards for showing up or finishing alone can undermine motivation (d ≈ −0.28 to −0.40).<sup><a href="#s6">6</a></sup></li>
+  <li>Effects drop after about four weeks, then partly recover.<sup><a href="#s7">7</a></sup></li>
+  <li>Leaderboards, points and badges are the elements most often linked to negative effects, including gaming the system.<sup><a href="#s4">4</a></sup></li></ul></div></div>
+<h3>Rules for CAI 3801 Studio</h3>
+<ol><li>XP mostly for evidence of mastery (correct checks, rubric-scored work), less for opening a page. XP never counts toward the grade.</li>
+<li>The private competency radar and specific feedback are the main rewards.</li>
+<li>Team quests with an opt-in, team-level board; no ranked list of individuals.</li>
+<li>A light story: students are analysts at a fictional firm, and each lab is a client brief.</li>
+<li>Choice boards: two or three quest options a week.</li>
+<li>A "season" refresh around week 5 with new quest types.</li>
+<li>Streaks count weeks, not days, so a busy day never breaks one.</li></ol>
+<p class="callout">The prototype follows rule 1: opening a reading earns 10 XP, a correct check 40, graded work 100 to 150.</p></section>
+
+<section id="personas"><h2><span class="n">Ask 3</span>Three personas, one weekly rhythm</h2>
+<div class="grid3">
+ <div class="box"><h3>Student</h3><ul><li>Home: this week's quest, three next steps with reasons, level and streak</li><li>Weekly lesson: read, check, build, reflect</li><li>Skills radar against the class average</li><li>AI tutor beside the readings</li><li>Grades with TA feedback and a human-review button</li></ul></div>
+ <div class="box"><h3>Teaching assistant</h3><ul><li>Grading queue: AI first pass with evidence and confidence; the TA decides every score</li><li>Class activity heatmap</li><li>Students to check on, with readable reasons and a drafted check-in</li><li>Tutor question topics, not names</li></ul></div>
+ <div class="box"><h3>Faculty</h3><ul><li>Course overview and class competencies</li><li>Lesson planner with coverage counts</li><li>Grading calibration (κ per criterion) and sign-off on escalated grades</li><li>Cohort insights</li><li>Model choice and MCP tool permissions</li></ul></div></div></section>
+
+<section id="tracking"><h2><span class="n">Ask 4</span>Activity tracking and personalised next steps</h2>
+<ul><li><b>Record events in a standard shape.</b> Actor, verb, object, time, result, following xAPI (IEEE 9274.1.1) or 1EdTech Caliper 1.2, so the data stays portable.<sup><a href="#s10">10</a><a href="#s11">11</a></sup></li>
+<li><b>Weight graded work above clicks.</b> Across 17 courses, click data predicted poorly and added little once interim grades existed.<sup><a href="#s12">12</a></sup></li>
+<li><b>Use transparent rules first.</b> Overdue work, a weak competency backed by two graded items, five days inactive, repeated tutor questions without the check, and a strength worth stretching. Each shows the student why it appears.</li>
+<li><b>Tie nudges to concrete course actions.</b> Generic nudges showed no effect in large trials;<sup><a href="#s24">24</a></sup> course-embedded nudges linked to specific supports raised A/B grades by 4 points at Georgia State.<sup><a href="#s25">25</a></sup></li>
+<li><b>Flags start a human conversation, never a penalty.</b> Georgia State paired alerts with more advisors.<sup><a href="#s13">13</a></sup> Purdue's Course Signals claim did not survive scrutiny.<sup><a href="#s26">26</a></sup></li></ul></section>
+
+<section id="tutor"><h2><span class="n">Ask 11</span>The AI tutor</h2>
+<ol><li>Hints and Socratic questions by default; never a full answer to graded work.<sup><a href="#s9">9</a><a href="#s27">27</a></sup></li>
+<li>Grounded in course readings and instructor-written solutions, with citations.<sup><a href="#s8">8</a></sup></li>
+<li>Given a short summary of the student's recent attempts and gaps; Khan Academy saw a 6.1% gain in next-item correctness from this.<sup><a href="#s28">28</a></sup></li>
+<li>Judged by unaided performance (checks and quizzes without AI), because practice gains can hide exam losses.<sup><a href="#s9">9</a></sup></li>
+<li>Positioned as preparation for class, not a replacement.<sup><a href="#s8">8</a></sup></li></ol>
+<p>The prototype's tutor now runs retrieval-augmented generation in the browser: the readings are split into overlapping passages, ranked with BM25 and, when Ollama has an embedding model, with meaning-based search, merged by reciprocal rank fusion.<sup><a href="#s80">80</a><a href="#s81">81</a><a href="#s82">82</a></sup> If nothing matches well it says the readings don't cover the question without calling the model. On 24 course questions the right reading was in the top three every time, with no wrong refusals; all 7 off-topic questions were declined. It has four modes (Explain, a three-step Hint ladder, Quiz me, Check me), cites numbered sources, flags numbers that are not in the sources, and switches to coaching when a student asks for graded answers. It also answers only from the readings, cites them by number, and refuses to give a student's own lab answers. On Google Cloud it would ground on a RAG Engine corpus of the syllabus, slides and readings.<sup><a href="#s31">31</a></sup></p></section>
+
+<section id="prompting"><h2><span class="n">New</span>Seeing how students prompt, and helping them improve</h2>
+<p>The professor asked to see how students prompt AI and how they can get better. Three pieces in the Studio answer that.</p>
+<ol><li><b>App Builder.</b> Modelled on Stanford's Probability for AI, where students build a portfolio of apps with a code agent and must explain their reasoning live to a section leader.<sup><a href="#s70">70</a><a href="#s71">71</a></sup> Students describe an analytics app; the agent sees only the function name and the data, so the rules behind the tests must come from the student's prompt. A vague prompt fails the edge-case tests, the page names what was missing, and the next prompt fixes it. Every version is kept. When all tests pass the student explains how the app decides and what could break it, Piech's test of "growing alongside the AI".<sup><a href="#s72">72</a></sup> Apps run in a sandboxed frame with no access to the page or the network.</li>
+<li><b>My prompting (student).</b> Every prompt is scored on six parts: Task, Context, References, Format, Rules and Iterate, adapted from Google's Prompting Essentials (Task, Context, References, Evaluate, Iterate).<sup><a href="#s73">73</a></sup> A coach picks the student's weakest recent prompt and rescores the rewrite as they type. Automated prompt assessment is an active research area with promising early results.<sup><a href="#s76">76</a><a href="#s77">77</a></sup></li>
+<li><b>Prompt insights (TA and faculty).</b> Class trends by part, a "teach this next" card, the topics students ask the tutor about (themes rather than raw counts, as Toronto's tools summarise them), a searchable prompt gallery, each student's timeline and App Builder attempts, a CSV export, and an AI-drafted coaching note the TA edits before sending.<sup><a href="#s74">74</a><a href="#s75">75</a></sup> Teachers in a prompt-dashboard study found frequency charts hard to act on, so each view ends in a teaching action.<sup><a href="#s75">75</a></sup></li></ol>
+<p><b>Round two.</b> Three more ideas from current research. <i>Try first</i>: for why and how questions the tutor asks for the student's guess before explaining, because the tutors that help most require an attempt before help, while a default answer-giving tutor lowered grades by 0.37 standard deviations in a 2,379-student trial.<sup><a href="#s83">83</a><a href="#s84">84</a></sup> <i>You first, then AI, then compare</i> in the Prompt Lab, after a business-course study of that reflective cycle.<sup><a href="#s85">85</a></sup> An <i>AI-use log</i> students download and submit with the final project, as in Lehigh's AI literacy course.<sup><a href="#s86">86</a></sup> Prompt insights also maps the class onto Anthropic's 4D AI Fluency framework: Delegation, Description, Discernment and Diligence.<sup><a href="#s87">87</a></sup></p>
+<p><b>Round three.</b> Two more, aimed at checking and remembering. <i>Fact-check the AI</i>: students label each sentence of an AI answer as true, false or can't tell from the data, then see why. It follows classroom "human validator" and claim-by-claim reality-check exercises, which reward careful checking over simply disagreeing with the AI.<sup><a href="#s88">88</a><a href="#s89">89</a></sup> <i>Spaced quick review with a confidence check</i>: earlier weeks come back on a Leitner schedule (a miss returns tomorrow, a confident right answer after up to 30 days), and students say how sure they are before the options show. An AI tutor built on spaced retrieval was linked to higher exam grades, though that study was not randomized; practice with feedback improves calibration; and errors made with high confidence are the ones people correct best.<sup><a href="#s90">90</a><a href="#s91">91</a><a href="#s92">92</a></sup> Fact-check results now feed the Discernment row of the 4D card.</p>
+<p><b>Rules:</b> students are told their prompts are visible; scores coach and never grade, as in Texas State's non-punitive deployment.<sup><a href="#s78">78</a></sup> Questions to the tutor count only for intent (learning or answer-seeking), not the six-part score. Human contact still matters most: in Code in Place trials, 10 minutes with a person raised completion by 10 points, while chatbot access alone lowered it by 3.<sup><a href="#s71">71</a></sup> Even CS50's tutor, told not to, still gives code blocks up to a quarter of the time, so the course keeps a human check on learning.<sup><a href="#s79">79</a></sup></p></section>
+
+<section id="grading"><h2><span class="n">Ask 10</span>Hybrid grading with a human touch</h2>
+<pre class="mermaid">flowchart LR
+  A[Student submits] --> B[Objective items scored by code]
+  A --> C[AI first pass per criterion<br/>quote + confidence]
+  C --> D{TA reviews every score}
+  B --> D
+  D -->|confidence under 0.6, flag,<br/>or TA and AI differ by 2+| E[Faculty sign-off]
+  D --> F[Released with TA feedback]
+  E --> F
+  F --> G[Student can request a<br/>full human review]</pre>
+<div class="grid2">
+ <div class="box"><h3>Why this shape</h3><ul>
+  <li>Agreement varies widely by task: near-human on checklist items,<sup><a href="#s20">20</a></sup> poor on analytic ones in a medical study.<sup><a href="#s21">21</a></sup></li>
+  <li>Bias against informal or non-native writing persists even with instructions not to.<sup><a href="#s22">22</a></sup></li>
+  <li>A human-in-the-loop math study kept mandatory verification and graded 23% faster.<sup><a href="#s29">29</a></sup></li></ul></div>
+ <div class="box"><h3>Calibration gate</h3><ul>
+  <li>Before AI suggestions are used on a criterion: quadratic weighted κ of at least 0.70 against human scores, less than 0.10 below human-to-human agreement, and a standardized mean difference under 0.15.<sup><a href="#s23">23</a></sup></li>
+  <li>Re-check weekly on a double-graded sample.</li>
+  <li>Analytic, judgment-heavy criteria stay human-led.</li></ul></div></div>
+<p class="callout">Policy: tell students where AI assisted, and give them a full human review with no penalty, as UNC and SDSU require.<sup><a href="#s32">32</a><a href="#s33">33</a></sup> UCF calls AI-only grading unethical.<sup><a href="#s34">34</a></sup> No USF-specific AI-grading policy was found; confirm with the department.</p></section>
+
+<section id="agentic"><h2><span class="n">Ask 5</span>Agentic AI skills</h2>
+<p>Built on the published agent-building guidance from Anthropic and OpenAI, OWASP's LLM risk list and NIST's guidance on human oversight.<sup><a href="#s35">35</a><a href="#s36">36</a><a href="#s37">37</a><a href="#s38">38</a></sup></p>
+<div class="tw"><table><tr><th>Skill</th><th>What students do</th><th>Week</th></tr>
+<tr><td>Workflow or agent</td><td>Choose the simplest design that works; justify it by the task's variability and risk</td><td>11</td></tr>
+<tr><td>Tool design</td><td>Specify a tool: name, inputs, outputs, failure behaviour</td><td>4, 11</td></tr>
+<tr><td>Instructions and policy</td><td>Write the agent's instructions and the policy it must follow</td><td>11</td></tr>
+<tr><td>Guardrails</td><td>Treat request text as data; resist prompt injection (OWASP LLM01) and excessive agency (LLM06)</td><td>12</td></tr>
+<tr><td>Human approval</td><td>Put a person before every consequential action; log overrides</td><td>12, 14</td></tr>
+<tr><td>Evaluation</td><td>Build a test set (normal, edge, adversarial, refusal) and measure against a baseline</td><td>13, 14</td></tr>
+<tr><td>Traces and audit</td><td>Keep a run log; debug from traces</td><td>13</td></tr>
+<tr><td>Cost and latency</td><td>Measure tokens and dollars; pick the cheapest model that passes (OWASP LLM10)</td><td>13</td></tr>
+<tr><td>MCP</td><td>Connect an agent to course data through an MCP server with narrow tools</td><td>13</td></tr></table></div>
+<p>The week 12 Discount Desk lab already teaches guardrails, prompt injection, name mismatches and the human gate on real course data.</p></section>
+
+<section id="arch"><h2><span class="n">Asks 6–8</span>Architecture on Google Cloud</h2>
+<pre class="mermaid">flowchart TB
+  U[Students, TAs, faculty] -->|USF sign-in via Identity Platform| W[Studio web app<br/>Cloud Run]
+  W --> API[Studio API<br/>Cloud Run]
+  API --> FS[(Firestore<br/>courses, submissions, grades)]
+  API --> PS[[Pub/Sub]] --> BQ[(BigQuery<br/>activity events)]
+  API --> GCS[(Cloud Storage<br/>readings, submissions)]
+  API --> LLM{Model provider}
+  LLM --> G[Gemini Flash<br/>Agent Platform]
+  LLM --> O[Gemma 4 / gpt-oss<br/>Model Garden]
+  LLM --> X[USF or self-hosted<br/>OpenAI-compatible]
+  API --> RAG[RAG Engine<br/>course corpus]
+  MCP[Course MCP server<br/>Cloud Run] --> FS
+  MCP --> BQ
+  AG[Tutor and grading agents<br/>ADK on Agent Runtime] --> MCP
+  AG --> LLM</pre>
+<p>Google renamed Vertex AI to <b>Gemini Enterprise Agent Platform</b> in April 2026, and Agent Engine is now <b>Agent Runtime</b>.<sup><a href="#s39">39</a></sup> The backend uses Cloud Run, Firestore, Pub/Sub to BigQuery, Cloud Storage and Secret Manager, deployed by Terraform.</p></section>
+
+<section id="models"><h2><span class="n">Ask 7</span>Model options</h2>
+<div class="tw"><table><tr><th>Option</th><th>Licence</th><th>Use</th></tr>
+<tr><td>Gemini Flash on Agent Platform (3.5 or 3.8)</td><td>Google Cloud terms</td><td>Default tutor and grading suggestions; 1M-token context, structured output<sup><a href="#s40">40</a></sup></td></tr>
+<tr><td>Gemma 4 (E2B to 31B)</td><td>Apache 2.0</td><td>Open option, served from Model Garden or Cloud Run with GPUs<sup><a href="#s41">41</a></sup></td></tr>
+<tr><td>gpt-oss 120B / 20B</td><td>Apache 2.0</td><td>Open option, managed on Agent Platform<sup><a href="#s42">42</a></sup></td></tr>
+<tr><td>Llama 4</td><td>Llama 4 Community License (attribution and naming rules)</td><td>Possible, but the licence is not open source<sup><a href="#s43">43</a></sup></td></tr>
+<tr><td>USF-provided or self-hosted model</td><td>Varies</td><td>Any OpenAI-compatible endpoint (vLLM on GKE or a USF GPU cluster)</td></tr></table></div>
+<p class="callout"><b>Running locally now:</b> Llama 3.1 8B through Ollama on a laptop powers the Studio's tutor, Prompt Lab, client meeting and grading suggestions, and the backend API. Student work never leaves the machine. Small local models hallucinate more (Llama 3.1 8B: 54% on a hard summarization benchmark, vs 39% for GPT-4o) and grade overconfidently, so the human checks stay.<sup><a href="#s70">70</a></sup></p>
+<p class="callout"><b>What USF provides today:</b> Microsoft Copilot Chat for all students and staff, which USF calls data-protected.<sup><a href="#s44">44</a></sup> No USF licence for Gemini, ChatGPT Edu or Claude for Education was found. Research Computing lists about 170 GPUs available for instruction by reservation.<sup><a href="#s45">45</a></sup></p></section>
+
+<section id="mcp"><h2><span class="n">Ask 6</span>MCP: course data for agents</h2>
+<ul><li><b>Spec:</b> MCP revision 2026-07-28 (stateless), stdio and Streamable HTTP transports, OAuth 2.1 for remote servers.<sup><a href="#s46">46</a><a href="#s47">47</a></sup></li>
+<li><b>Course MCP server (built):</b> seven tools: <code>list_lessons</code>, <code>get_student_progress</code>, <code>recommend_next_steps</code>, <code>get_rubric</code>, <code>suggest_rubric_scores</code>, <code>record_review</code>, <code>class_overview</code>. Students can read only their own data; grade-writing tools need a TA or faculty role.</li>
+<li><b>Google-managed MCP servers:</b> BigQuery and Firestore are generally available; Sheets is in developer preview.<sup><a href="#s30">30</a></sup> Host custom servers on Cloud Run behind IAM.<sup><a href="#s48">48</a></sup></li>
+<li><b>Safety:</b> keep a human able to deny tool calls, treat tool descriptions as untrusted, validate inputs, never pass tokens through.<sup><a href="#s49">49</a></sup> Model Armor screens prompt injection.<sup><a href="#s30">30</a></sup></li>
+<li><b>Agent Skills:</b> package course know-how (rubric grading, Socratic tutoring) as <code>SKILL.md</code> folders, an open standard now under the Linux Foundation and supported by Google's ADK.<sup><a href="#s50">50</a><a href="#s51">51</a></sup></li></ul></section>
+
+<section id="privacy"><h2>Privacy and governance</h2>
+<ul><li>Under FERPA, an outside service may receive student records only as a "school official" under the university's direct control.<sup><a href="#s52">52</a></sup> Student data should go only to university-contracted AI.</li>
+<li>USF guidance says not to put protected student data into AI tools, and course chatbots should use USF-supported platforms.<sup><a href="#s44">44</a></sup> The Studio would need USF IT and data-governance approval before real students use it.</li>
+<li>Recommendations and flags are readable rules; no raw risk score is shown to a student.</li>
+<li>Students can see and correct their own records; AI-generated records are part of that.<sup><a href="#s53">53</a></sup></li></ul></section>
+
+<section id="plan"><h2>Build plan and cost</h2>
+<div class="tw"><table><tr><th>Phase</th><th>When</th><th>What</th></tr>
+<tr><td>0. Approvals</td><td>Weeks 0–2</td><td>FERPA and data-governance review with USF IT; USF sign-in registration; a GCP project with budget alerts</td></tr>
+<tr><td>1. Pilot</td><td>Weeks 3–8</td><td>One unit, 20–40 students: tutor grounded on readings, activity to BigQuery, TA view</td></tr>
+<tr><td>2. Grading</td><td>Weeks 9–14</td><td>AI first pass with TA review; calibration gate; MCP tools; compare Gemini with Gemma 4 or gpt-oss</td></tr>
+<tr><td>3. Full course</td><td>Next term</td><td>All sections; optional Canvas grade sync over LTI 1.3; evaluation of learning and cost</td></tr></table></div>
+<p><b>Rough cost:</b> about $100–350 a month for 100–300 students using managed Gemini Flash, excluding self-hosted GPUs. This is an estimate from published and third-party token prices, not a quote; official prices should be checked before budgeting.<sup><a href="#s54">54</a></sup></p></section>
+
+<section id="built"><h2>What exists today</h2>
+<div class="grid2">
+ <div class="box"><h3>Working prototype</h3><p>Three personas, weekly quests, XP and badges, the skills radar, next steps with reasons, four practice tools (Prompt Lab, Tool Trainer, Agent Builder, Client meeting), the Discount Desk lab, the AI tutor, the grading queue with live AI suggestions on claude.ai, calibration, and model and MCP settings. Classmates' data is simulated.</p></div>
+ <div class="box"><h3>Backend code (in the project folder)</h3><p>A Cloud Run API, the course MCP server (seven tools, stdio and Streamable HTTP), one interface for Gemini, open models and OpenAI-compatible endpoints, the recommendation, competency and grading rules, and Terraform for Google Cloud. 67 automated tests pass locally, and role checks were confirmed by hand.</p><p class="tag" style="border-radius:8px;display:block;margin-top:10px">Not yet verified: real calls to Gemini, Firestore or BigQuery, the Terraform plan and the Docker builds. Nothing is deployed.</p></div></div></section>
+
+<section id="open"><h2>Questions to settle</h2>
+<ol><li>Which identity provider USF uses for NetID (Entra ID or Shibboleth), and whether IT will register the Studio.</li>
+<li>Whether USF has, or will get, an enterprise licence for Gemini for Education or another model.</li>
+<li>Whether a USF GPU cluster can host an open model for coursework.</li>
+<li>The department's position on AI-assisted grading and disclosure.</li>
+<li>Whether grades stay in Canvas (sync over LTI) or the Studio becomes the record.</li>
+<li>Which competencies are graded, and which are only tracked for feedback.</li></ol></section>
+
+<section id="sources"><h2>Sources</h2>
+<p class="callout">Gathered by three research passes on November 23, 2026. Items the researchers could only see in summaries are noted. Product names and prices change quickly; confirm before quoting.</p>
+<ol class="src">
+<li id="s1">Sailer &amp; Homner (2020), The Gamification of Learning: a Meta-analysis, Educational Psychology Review. https://doi.org/10.1007/s10648-019-09498-w</li>
+<li id="s2">Bai, Hew &amp; Huang (2020), Educational Research Review 33. https://www.gbl.uzh.ch/quartz/references/Bai-et-al.-(2020)</li>
+<li id="s3">Li, Ma &amp; Shi (2023), Frontiers in Psychology. https://doi.org/10.3389/fpsyg.2023.1253549</li>
+<li id="s4">Almeida et al. (2023), Negative Effects of Gamification in Education Software. https://arxiv.org/abs/2305.08346</li>
+<li id="s5">Sailer et al. (2017), How gamification motivates, Computers in Human Behavior. https://doi.org/10.1016/j.chb.2016.12.033</li>
+<li id="s6">Deci, Koestner &amp; Ryan (1999), Psychological Bulletin. https://doi.org/10.1037/0033-2909.125.6.627</li>
+<li id="s7">Rodrigues et al. (2022), Gamification suffers from the novelty effect. https://doi.org/10.1186/s41239-021-00314-6</li>
+<li id="s8">Kestin et al. (2025), AI tutoring outperforms in-class active learning, Scientific Reports. https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12179260/fullTextXML</li>
+<li id="s9">Bastani et al. (2025), Generative AI without guardrails can harm learning, PNAS. https://knowledge.wharton.upenn.edu/article/without-guardrails-generative-ai-can-harm-education/</li>
+<li id="s10">xAPI overview. https://xapi.com/overview/</li>
+<li id="s11">1EdTech Caliper Analytics 1.2. https://www.imsglobal.org/spec/caliper/v1p2</li>
+<li id="s12">Conijn et al., Predicting student performance from LMS data across 17 courses. https://research.tue.nl/en/publications/predicting-student-performance-from-lms-data-a-comparison-of-17-b/</li>
+<li id="s13">WGBH/NPR (2016), Georgia State advising and graduation rates. https://www.wgbh.org/news/2016-10-30/how-one-university-used-big-data-to-boost-graduation-rates</li>
+<li id="s14">EU summary of WEF Future of Jobs 2025. https://digital-skills-jobs.europa.eu/en/latest/news/great-skills-reset-wefs-future-jobs-report-2025-catch-22-future-work</li>
+<li id="s15">Lightcast, Beyond the Buzz (2025). https://lightcast.io/resources/blog/beyond-the-buzz-press-release-2025-07-23</li>
+<li id="s16">AAC&amp;U VALUE rubrics. https://www.aacu.org/initiatives/value-initiative/value-rubrics</li>
+<li id="s17">Stanford d.school, Design Thinking Bootleg. https://dschool.stanford.edu/resources/design-thinking-bootleg</li>
+<li id="s18">Wing (2006) https://www.cs.cmu.edu/~15110-s13/Wing06-ct.pdf ; Brennan &amp; Resnick (2012) https://scratched.gse.harvard.edu/ct/files/AERA2012.pdf</li>
+<li id="s19">UNESCO AI competency frameworks https://www.unesco.org/en/articles/what-you-need-know-about-unescos-new-ai-competency-frameworks-students-and-teachers ; Digital Promise https://digitalpromise.org/2024/02/21/revealing-an-ai-literacy-framework-for-learners-and-educators/ ; AI Fluency framework https://assets.claude.com/334975cdec18f744b4fa511dc8518bd8d119d29d.pdf</li>
+<li id="s20">Henkel et al., Can LLMs Make the Grade? https://arxiv.org/abs/2405.02985</li>
+<li id="s21">Jade &amp; Yartsev, automated grading of short answers in mechanical ventilation. https://www.arxiv.org/pdf/2505.04645</li>
+<li id="s22">Jadhav et al., Implicit Grading Bias in LLMs. https://arxiv.org/html/2603.18765</li>
+<li id="s23">ETS RM-23-01 (Casabianca et al.), citing Williamson et al. (2012). https://www.ets.org/Media/Research/pdf/RM-23-01.pdf</li>
+<li id="s24">Oreopoulos &amp; Petronijevic, NBER w26059. https://www.nber.org/papers/w26059</li>
+<li id="s25">Meyer, Page et al., Let's Chat, EdWorkingPaper 22-564. https://edworkingpapers.com/sites/default/files/ai22_564_v3.pdf</li>
+<li id="s26">Times Higher Education, Student retention software under the microscope. https://www.timeshighereducation.com/news/student-retention-software-comes-under-microscope/2008904.article</li>
+<li id="s27">Anthropic, Introducing Claude for Education. https://www.anthropic.com/news/introducing-claude-for-education</li>
+<li id="s28">Khan Academy, How we're building a better AI tutor. https://blog.khanacademy.org/how-khan-academy-is-building-a-better-ai-tutor-our-most-recent-learnings/</li>
+<li id="s29">Vanhoyweghen et al., human-in-the-loop math grading. https://arxiv.org/html/2603.13083v1</li>
+<li id="s30">Google Cloud, Google-managed MCP servers. https://cloud.google.com/blog/products/ai-machine-learning/google-managed-mcp-servers-are-available-for-everyone ; supported products https://docs.cloud.google.com/mcp/supported-products</li>
+<li id="s31">RAG Engine overview. https://docs.cloud.google.com/vertex-ai/generative-ai/docs/rag-overview</li>
+<li id="s32">UNC, Guidance for Faculty Use of AI in Grading and Assessment (2026). https://ai.unc.edu/wp-content/uploads/sites/1362/2026/03/Guidance-for-Faculty-Use-of-AI-in-Grading-and-Assessment-_Final.pdf</li>
+<li id="s33">SDSU CTL, AI and Academic Integrity. https://ctl.sdsu.edu/teaching_resources/ai-academicintegrity</li>
+<li id="s34">UCF, Responsible AI Use at UCF. https://aiforall.ucf.edu/about/responsible-ai-use-at-ucf/</li>
+<li id="s35">Anthropic, Building Effective AI Agents. https://www.anthropic.com/engineering/building-effective-agents</li>
+<li id="s36">OpenAI, A Practical Guide to Building Agents. https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf</li>
+<li id="s37">OWASP Top 10 for LLM Applications 2025. https://genai.owasp.org/llm-top-10/</li>
+<li id="s38">NIST AI RMF, Appendix C. https://airc.nist.gov/airmf-resources/airmf/appendices/app-c-ai-risk-management-and-human-ai-interaction</li>
+<li id="s39">Google Cloud, Introducing Gemini Enterprise Agent Platform. https://cloud.google.com/blog/products/ai-machine-learning/introducing-gemini-enterprise-agent-platform</li>
+<li id="s40">Gemini 3.5 Flash model page. https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/3-5-flash</li>
+<li id="s41">Gemma 4 announcement. https://blog.google/innovation-and-ai/technology/developers-tools/gemma-4/</li>
+<li id="s42">Open models on Agent Platform (MaaS). https://docs.cloud.google.com/vertex-ai/generative-ai/docs/maas/use-open-models</li>
+<li id="s43">Llama 4 Community License. https://raw.githubusercontent.com/meta-llama/llama-models/main/models/llama4/LICENSE</li>
+<li id="s44">USF, Generative AI university guidance. https://genai.usf.edu/at-usf/university-guidance/</li>
+<li id="s45">USF Bellini College, CITA resources (GPU clusters). https://www.usf.edu/ai-cybersecurity-computing/centers/cita/resources</li>
+<li id="s46">MCP specification changelog. https://modelcontextprotocol.io/specification/latest/changelog</li>
+<li id="s47">MCP authorization. https://modelcontextprotocol.io/specification/latest/basic/authorization</li>
+<li id="s48">Host MCP servers on Cloud Run. https://docs.cloud.google.com/run/docs/host-mcp-servers</li>
+<li id="s49">MCP security best practices. https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices</li>
+<li id="s50">Agent Skills specification. https://agentskills.io/specification ; Anthropic donation https://www.anthropic.com/news/donating-agent-skills-to-the-agentic-ai-foundation</li>
+<li id="s51">ADK skills. https://adk.dev/skills/</li>
+<li id="s52">US Department of Education, Who is a school official under FERPA? https://studentprivacy.ed.gov/faq/who-school-official-under-ferpa</li>
+<li id="s53">AACRAO FERPA guide addendum. https://www.aacrao.org/news/new-addendum-builds-on-the-trusted-aacrao-2012-ferpa-guide/</li>
+<li id="s54">Agent Platform pricing (summary only) https://cloud.google.com/products/gemini-enterprise-agent-platform/pricing ; third-party Gemini 3.5 Flash prices https://apidog.com/blog/gemini-3-5-flash-pricing/</li>
+<li id="s55">Liu et al. (2024), Teaching CS50 with AI, SIGCSE. https://cs.harvard.edu/malan/publications/V1fp0567-liu.pdf</li>
+<li id="s56">HBS Data Science and AI for Leaders. https://poetsandquants.com/2026/09/14/inside-the-classroom-how-ai-is-reshaping-the-mba-at-harvard-business-school/</li>
+<li id="s57">Mollick &amp; Mollick, Instructors as Innovators. https://arxiv.org/abs/2407.05181</li>
+<li id="s58">Stanford Teaching Commons, Integrating AI into assignments. https://teachingcommons.stanford.edu/teaching-guides/artificial-intelligence-teaching-guide/integrating-ai-assignments</li>
+<li id="s59">MIT Sloan, AI detectors don't work. https://mitsloanedtech.mit.edu/ai/teach/ai-detectors-dont-work/</li>
+<li id="s60">Harvard OUE, Generative AI guidance. https://oue.fas.harvard.edu/faculty-resources/generative-ai-guidance</li>
+<li id="s61">CMU, AI tools and academic integrity. https://www.cmu.edu/teaching/technology/aitools/academicintegrity/index.html</li>
+<li id="s62">Berkeley CS 61A Bot. https://arxiv.org/html/2406.05600v3</li>
+<li id="s63">Georgia Tech, Jill Watson. https://www.cc.gatech.edu/news/georgia-techs-jill-watson-outperforms-chatgpt-real-classrooms</li>
+<li id="s64">Requirements-focused prompt training RCT. https://arxiv.org/abs/2409.08775</li>
+<li id="s65">Adaptive Parsons problems. https://arxiv.org/html/2512.22407</li>
+<li id="s66">Anthropic, Building effective agents. https://www.anthropic.com/engineering/building-effective-agents</li>
+<li id="s67">Anthropic, Demystifying evals for AI agents. https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents</li>
+<li id="s68">Nielsen Norman Group, Concise, scannable and objective. https://www.nngroup.com/articles/concise-scannable-and-objective-how-to-write-for-the-web/</li>
+<li id="s70">FaithBench: hallucinations in summarization by modern LLMs. https://arxiv.org/html/2410.13210v1 ; Ollama structured outputs https://docs.ollama.com/capabilities/structured-outputs</li>
+<li id="s69">GOV.UK, Writing clearly. https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/writing-guidelines/clear-language/</li>
+<li id="s70">Stanford, Probability for Artificial Intelligence (PAI), course homepage, accessed Nov 25, 2026. https://pai.stanford.edu/</li>
+<li id="s71">Stanford Daily (Sep 28, 2026), Creators of Code in Place champion human connection in two new courses. https://stanforddaily.com/2026/09/28/creators-of-code-in-place-champion-human-connection-in-two-new-courses/</li>
+<li id="s72">EO Magazine, Stanford CS Professor: AI Can Code. That's Why You Should Learn (Chris Piech interview). https://www.eomag.io/article/stanford-chris-piech</li>
+<li id="s73">Google, Prompting Essentials (Coursera), five-step framework: Task, Context, References, Evaluate, Iterate. https://www.coursera.org/learn/google-start-writing-prompts-like-a-pro</li>
+<li id="s74">University of Toronto, Generative AI Tools (instructor dashboard of aggregated conversation themes). https://teaching.utoronto.ca/teaching-uoft-genai/genai-tools/</li>
+<li id="s75">Designing Prompt Analytics Dashboards to Analyze Student-ChatGPT Interactions in EFL Writing (2024). https://arxiv.org/abs/2405.19691</li>
+<li id="s76">Xiao et al. (2025), Learning to Use AI for Learning: teaching and measuring prompting literacy. https://arxiv.org/abs/2508.13962</li>
+<li id="s77">Ognibene et al. (2025), assessing students' prompting skills with LLM-based methods. https://arxiv.org/abs/2503.02532</li>
+<li id="s78">Texas State University, 2026 AI Symposium session abstracts (Critical Prompt Literacy; non-punitive analytics). https://doit.txst.edu/txstai/symposium/agenda2026/2026sessionabstracts.html</li>
+<li id="s79">Harvard Gazette (Sep 2026), Taming the duck (CS50's AI tutor). https://news.harvard.edu/gazette/story/2026/09/taming-the-duck-for-starters/</li>
+<li id="s80">Robertson &amp; Zaragoza (2009), The Probabilistic Relevance Framework: BM25 and Beyond, Foundations and Trends in Information Retrieval.</li>
+<li id="s81">Cormack, Clarke &amp; Buettcher (2009), Reciprocal Rank Fusion outperforms Condorcet and individual rank learning methods, SIGIR.</li>
+<li id="s82">Nussbaum et al. (2024), Nomic Embed: Training a Reproducible Long Context Text Embedder. https://arxiv.org/abs/2402.01613</li>
+<li id="s83">Kestin et al. (2025), AI tutoring outperforms in-class active learning, Scientific Reports (Harvard physics RCT), as summarised in 2026 reviews.</li>
+<li id="s84">The Effects of Course-Integrated AI Tutoring on Student Performance and Engagement: A Randomized University Trial (2026), EdWorkingPapers ai26-1598. https://edworkingpapers.com/ai26-1598</li>
+<li id="s85">You Do It, AI Does It, You Compare and Reflect: Exploring Reflective Learning With Generative AI in Principles of Marketing. https://www.researchgate.net/publication/394066809</li>
+<li id="s86">A Discipline-Agnostic AI Literacy Course for Academic Research: Architecture, Pedagogy, and Implementation (2026). https://arxiv.org/abs/2604.27225</li>
+<li id="s87">Anthropic, AI Fluency: Framework and Foundations (Dakan and Feller), the 4D framework. https://www.anthropic.com/ai-fluency/overview</li>
+<li id="s88">Northern Illinois University, Human Wisdom for the Age of AI: Faculty Guide, critical thinking ("human validator" exercise). https://www.niu.edu/artificial-intelligence/students/guide/human-wisdom/faculty-guide/critical-thinking.shtml</li>
+<li id="s89">Times Higher Education Campus, "Don't ban GenAI, teach students to question it." https://www.timeshighereducation.com/campus/dont-ban-genai-teach-students-question-it</li>
+<li id="s90">Baillifard, Gabella, Banta Lavenex and Martarelli, Effective learning with a personal AI tutor: a case study. Education and Information Technologies 30(1), 2025 (spaced retrieval; 51 students; not randomized). https://arxiv.org/abs/2309.13060</li>
+<li id="s91">Educational Psychology Review (2025), randomized studies of practice with correct-answer, explanatory and AI-generated feedback versus lecture; practice improved calibration. https://link.springer.com/article/10.1007/s10648-025-10103-6</li>
+<li id="s92">Butterfield and Metcalfe (2001), Errors committed with high confidence are hypercorrected. Journal of Experimental Psychology: Learning, Memory, and Cognition, 27(6), 1491–1494.</li>
+</ol></section>
+</main>

@@ -1,0 +1,14 @@
+# Only platform/backend and site are copied into the classroom image.
+**/node_modules
+**/.env
+**/.env.*
+**/*.log
+*.tar.gz
+*backup*
+grader
+sites
+tests
+core
+platform/backend/test
+platform/backend/data
+platform/backend/infra/terraform
